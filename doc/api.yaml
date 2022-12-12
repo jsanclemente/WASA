@@ -1,0 +1,447 @@
+openapi: 3.0.0
+info:
+  title: WASAPhoto APIs
+  description: WASAPhoto app backend REST APIs
+  version: "3"
+components:
+  responses:
+    BadRequest:
+      description: |-
+        The request was not compliant with the documentation
+        (eg. missing fields, etc).
+    InternalServerError:
+      description: |-
+        The server encountered an internal error.
+        Further info in server logs.
+  parameters:
+    UserID:
+      schema:
+        type: integer
+        example: 1
+        readOnly: true
+      name: userId
+      in: path
+      required: true
+      description: User ID
+      
+    
+    Username:
+      schema:
+        type: string
+        example: "jsanclemente"
+        readOnly: true
+      name: userName
+      in: path
+      required: true
+      description: Username of a user
+      
+      
+    FollowedId:
+      schema:
+        type: integer
+        example: 1
+        readOnly: true
+      name: followedId
+      in: path
+      required: true
+      description: User followed Id
+      
+    BannedId:
+      schema:
+        type: integer
+        example: 44
+        readOnly: true
+      name: bannedId
+      in: path
+      required: true
+      description: Banned user Id
+      
+    PhotoId:
+      schema:
+        type: integer
+        example: 22
+        readOnly: true
+      name: photoId
+      in: path
+      required: true
+      description: Photo id
+  schemas:
+    User:
+      description: Abstracts a user containing info about the followers, following, username, and a list of users banned
+      type: object
+      properties: 
+        userName: 
+          type: string
+          example: "jsanclemente"
+        followers:
+          type: array
+          items: 
+            type: integer
+            example: 56
+        following:
+          type: array
+          items: 
+            type: integer
+            example: 33
+        nPhotos:
+          type: integer
+          example: 78
+        nFollowers:
+          type: integer
+          example: 348928
+        nFollowing: 
+          type: integer
+          example: 9038939
+    Username:
+      description: Username for an user in the application
+      type: string
+      example: "jsanclemente"
+      minLength: 3
+      maxLength: 20
+      pattern: 'ˆ.*?$'
+      
+    IdUser:
+      description: User identifier
+      type: integer
+      minimum: 1
+      maximum: 9999999
+      example: 1234567
+    
+    IdPhoto:
+      description: Photo identifier
+      type: integer
+      minimum: 1
+      maximum: 9999999
+      example: 123456
+      
+    nComments: 
+      description: Represent a number of comments posted for one photo
+      type: integer
+      minimum: 0
+      maximum: 9999999
+      example: 123
+      
+    nLikes:
+      description: Represent a number of likes added for one photo
+      type: integer
+      minimum: 0
+      maximum: 9999999
+      example: 123
+    
+      
+    Photo: 
+      description: Represents a photo on the application
+      type: object
+      properties:
+        idPhoto:
+          type: integer
+          example: 45
+        imageUrl:
+          type: string
+          example: "http://.../..."
+        userName:
+          description: The username that posts the photo
+          type: string
+          example: "jsanclemente"
+        nComments: 
+          description: Number of comments associated to the photo
+          type: integer
+          example: 35
+        nLikes: 
+          description: Number of likes associated to the photo
+          type: integer
+          example: 23455
+      
+      
+    
+    ListPhotos: 
+      description: Contains a list of schema "Photos"
+      type: array
+      minItems: 0
+      maxItems: 999999
+      items: 
+        $ref: '#/components/schemas/Photo'
+      
+          
+paths: 
+  
+  #doLogin
+  /users:
+     post:
+        tags: ["doLogin"]
+        summary: Logs in the user
+        description: |-
+          If the user does not exist, it will be created,
+          and an identifier is returned.
+          If the user exists, the user identifier is returned.
+        operationId: doLogin
+        requestBody:
+          description: User details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string 
+                    example: Maria
+                    pattern: 'ˆ.*?$'
+                    minLength: 3
+                    maxLength: 16
+          required: true
+        responses:
+          "201": { $ref: '#/components/schemas/IdUser' }
+          "400": { $ref: '#/components/responses/BadRequest' }
+          "404": { description: User not found }
+          "500": { $ref: '#/components/responses/InternalServerError' }
+                    
+  /users/{userId}/name:
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+      - $ref: '#/components/parameters/Username'
+    put: 
+        operationId: setMyUserName
+        tags: ["setMyUsername"]
+        summary: Changes the username of a user
+        description: Given a username changes the
+                    username associated to the user
+        requestBody: 
+          content: 
+            application/json:
+              schema: 
+                type: string
+                example: "jsanclemente"
+                
+        responses:
+          "200": { $ref: '#/components/schemas/Username' }
+          "400": { $ref: '#/components/responses/BadRequest' }
+          "404": { description: User not found }
+          "500": { $ref: '#/components/responses/InternalServerError' }
+        
+  /photos/{userId}:
+    parameters: 
+      - $ref: '#/components/parameters/UserID'
+    #uploadPhoto
+    post:
+        operationId: uploadPhoto
+        summary: Uploads a photo
+        tags: ["uploadPhoto"]
+        description: Returns the identifier of a uploaded photo
+        requestBody: 
+          content:
+            multipart/form-data:
+              schema: 
+                type: object
+                properties: 
+                  description:
+                    type: string
+                    example: "Eating at the Eiffel Tower"
+                  image:
+                    type: string
+                    format: binary
+                  userName:
+                    description: The username that posts the photo
+                    type: string
+                    example: "jsanclemente"
+                
+        responses:
+            "201": { $ref: '#/components/schemas/IdPhoto' }
+            "400": { $ref: '#/components/responses/BadRequest' }
+            "404": { description: User not found }
+            "500": { $ref: '#/components/responses/InternalServerError' }
+
+    
+  /users/{userId}/following/{followedId}:
+    parameters: 
+      - $ref: '#/components/parameters/UserID'
+      - $ref: '#/components/parameters/FollowedId'
+    put:
+      #followUser
+      operationId: followUser
+      summary: Follows a user
+      tags: ["followUser"]
+      description: The user identified as "userId" follows the user identified "followedId". Return the id of the followed user 
+      requestBody: 
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                follower: 
+                  type: string
+                  example: "jsanclee"
+                followed:
+                  type: string
+                  example: "arturo_perez"
+      responses:
+          "201": { $ref: '#/components/schemas/IdUser' }
+          "400": { $ref: '#/components/responses/BadRequest' }
+          "404": { description: User not found }
+          "500": { $ref: '#/components/responses/InternalServerError' }
+    delete: 
+      operationId: unfollowUser
+      summary: Unfollows a user
+      description: Returns the id of the unfollowed user
+      tags: ["unfollowUser"]
+      responses:
+          "200": { $ref: '#/components/schemas/IdUser' }
+          "400": { $ref: '#/components/responses/BadRequest' }
+          "404": { description: User not found }
+          "500": { $ref: '#/components/responses/InternalServerError' }
+  
+  /users/{userId}/banned/{bannedId}:
+    parameters: 
+      - $ref: '#/components/parameters/UserID'
+      - $ref: '#/components/parameters/BannedId'
+    #banUser
+    put:
+      operationId: banUser
+      summary: Bans a user
+      tags: ["banUser"]
+      description: The user identified as "userId" bans the user identified "bannedId". Returns the if of the user banned
+      requestBody: 
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                banner: 
+                  type: string
+                  example: "jsanclee"
+                banned:
+                  type: string
+                  example: "arturo_perez"
+      responses:
+          "200": { $ref: '#/components/schemas/IdUser' }
+          "400": { $ref: '#/components/responses/BadRequest' }
+          "404": { description: User not found }
+          "500": { $ref: '#/components/responses/InternalServerError' }
+      
+    delete:
+      operationId: unbanUser
+      tags: ["unbanUser"]
+      summary: Unbans a user
+      description: Return the id of the user unbanned
+      responses:
+          "200": { $ref: '#/components/schemas/IdUser' }
+          "400": { $ref: '#/components/responses/BadRequest' }
+          "404": { description: User not found }
+          "500": { $ref: '#/components/responses/InternalServerError'}
+      
+      
+    
+  /photos/{photoId}/likes/{userId}:
+    parameters:
+          - $ref: '#/components/parameters/PhotoId'
+          - $ref: '#/components/parameters/UserID'
+    #likePhoto
+    put: 
+      operationId: likePhoto
+      summary: Likes a photo of one user
+      description: Likes a photo. Returns the number of likes of the photo after the "like"
+      tags: ["likePhoto"]
+      responses: 
+          "200": { $ref: '#/components/schemas/nLikes' }
+          "400": { $ref: '#/components/responses/BadRequest' }
+          "404": { description: User not found }
+          "500": { $ref: '#/components/responses/InternalServerError'}
+    #unlikePhoto   
+    delete:
+      operationId: unlikePhoto
+      summary: Unlikes a photo
+      description: Unlikes a photo. Returns the number of likes of the photo after the dislike
+      tags: ["unlikePhoto"]
+      responses: 
+          "200": { $ref: '#/components/schemas/nLikes' }
+          "400": { $ref: '#/components/responses/BadRequest' }
+          "404": { description: User not found }
+          "500": { $ref: '#/components/responses/InternalServerError'}
+        
+  /photos/{photoId}/comments/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/PhotoId'
+      - $ref: '#/components/parameters/UserID'
+    put:
+      #commentPhoto
+      operationId: commentPhoto
+      tags: ["commentPhoto"]
+      description: Adds a comment for one post. Return the number of comments after the operation. 
+      summary: Comment a photo
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                userName: 
+                  type: string
+                  example: "jsanclee"
+                comment:
+                  type: string
+                  example: "Me encanta tu foto"
+      responses: 
+          "200": { $ref: '#/components/schemas/nComments' }
+          "400": { $ref: '#/components/responses/BadRequest' }
+          "404": { description: User not found }
+          "500": { $ref: '#/components/responses/InternalServerError'}
+    #uncommentPhoto
+    delete:
+      operationId: uncommentPhoto
+      summary: Uncomments a photo
+      description: Remove the comment of one post. Return the number of comments after the operation
+      tags: ["uncommentPhoto"]
+      responses: 
+        "200": { $ref: '#/components/schemas/nComments' }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "404": { description: User not found }
+        "500": { $ref: '#/components/responses/InternalServerError'} 
+        
+  /photos/{userId}/{photoId}:
+    parameters:
+       - $ref: '#/components/parameters/PhotoId'
+       - $ref: '#/components/parameters/UserID'
+    #deletePhoto
+    delete: 
+      operationId: deletePhoto
+      summary: Deletes a photo
+      description: Delete a photo. Returns the id of the photo deleted
+      tags: ["deletePhoto"]
+      responses: 
+        "200": { $ref: '#/components/schemas/IdPhoto' }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "404": { description: User not found }
+        "500": { $ref: '#/components/responses/InternalServerError'} 
+        
+  #getMyStream
+  /photos/{userId}/:
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+    get: 
+      operationId: getMyStream
+      summary: Gets the stream of the user. A stream is composed with photos posted by the users followed for this user.
+      tags: ["getMyStream"]
+      responses: 
+        "200": { $ref: '#/components/schemas/ListPhotos' }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "404": { description: User not found }
+        "500": { $ref: '#/components/responses/InternalServerError'} 
+        
+        
+  #getUserProfile      
+  /users/{userId}/:
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+    get:
+      operationId: getUserProfile
+      tags: ["getUserProfile"]
+      summary: Given a user returns the profile of the user
+      responses:
+        "200": { $ref: '#/components/schemas/User' }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "404": { description: User not found }
+        "500": { $ref: '#/components/responses/InternalServerError'} 
+      
+    
+    
+    
+    

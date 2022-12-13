@@ -3,6 +3,8 @@ info:
   title: WASAPhoto APIs
   description: WASAPhoto app backend REST APIs
   version: "3"
+servers:
+  - url: http://localhost:3000
 components:
   responses:
     BadRequest:

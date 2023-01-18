@@ -2,6 +2,7 @@
 Healthcheck is a simple program that sends an HTTP request to the local host (self) to a configured port number.
 It's used in environment where you need a simple probe for health checks (e.g., an empty container in docker).
 The probe URL is http://localhost:3000/liveness . Only the port can be changed.
+
 Usage:
 
 	healthcheck [flags]
@@ -15,6 +16,7 @@ Return values (exit codes):
 
 	0
 		The request was successful (HTTP 200 or HTTP 204)
+
 	> 0
 		The request was not successful (connection error or unexpected HTTP status code)
 */

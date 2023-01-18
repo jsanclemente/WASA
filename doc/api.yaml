@@ -5,7 +5,31 @@ info:
   version: '3'
 servers:
   - url: http://localhost:3000
+tags:
+  - name: "doLogin"
+    description: Endpoint for login operation
+    
+  - name: "Followers"
+    description: Endpoints for following or unfollowing an user
+  
+  - name: "Ban"
+    description: Endpoints for managing the banned users
+    
+  - name: "Photo"
+    description: Endpoints for managing the photos 
+    
+  - name: "Like"
+    description: Endpoints for managing the likes of the photos
+    
+  - name: "Comment"
+    description: Endpoints for managing the comment of the photos
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   responses:
     BadRequest:
       description: |-
@@ -29,7 +53,10 @@ components:
     Username:
       schema:
         type: string
+        minLength: 3
+        maxLength: 16
         example: jsanclemente
+        pattern: ˆ.*?$
         readOnly: true
       name: userName
       in: path
@@ -71,14 +98,24 @@ components:
       properties:
         userName:
           type: string
+          minLength: 0
+          maxLength: 999999
           example: jsanclemente
+          pattern: ˆ.*?$
+          description: Username
         followers:
           type: array
+          minItems: 0
+          maxItems: 999999
+          description: Array of followers of a determinated user
           items:
             type: integer
             example: 56
         following:
           type: array
+          description: Array with the users followed by the <username> 
+          minItems: 0
+          maxItems: 999999
           items:
             type: integer
             example: 33
@@ -96,14 +133,6 @@ components:
       description: Id for a user in the app
       type: integer
       example: 89
-  
-    Username:
-      description: Username for an user in the application
-      type: string
-      example: jsanclemente
-      minLength: 3
-      maxLength: 20
-      pattern: ˆ.*?$
     
     IdPhoto:
       description: Photo identifier
@@ -134,10 +163,15 @@ components:
         imageUrl:
           description: Url of the image 
           type: string
+          minLength: 0
+          maxLength: 999999
           example: http://.../...
+          pattern: ˆ.*?$
         userName:
           description: The username that posts the photo
           type: string
+          minLength: 0
+          maxLength: 999999
           example: jsanclemente
         nComments:
           description: Number of comments associated to the photo
@@ -156,7 +190,8 @@ components:
       items:
         $ref: '#/components/schemas/Photo'
         
-        
+security:
+  - bearerAuth: []      
 paths:
   /users:
     post:
@@ -173,9 +208,11 @@ paths:
         content:
           application/json:
             schema:
+              description: Username
               type: object
               properties:
                 name:
+                  description: name of the user
                   type: string
                   example: Maria
                   pattern: ˆ.*?$
@@ -203,18 +240,26 @@ paths:
     put:
       operationId: setMyUserName
       tags:
-        - setMyUsername
+        - User
       summary: Changes the username of a user
       description: Given a username changes the username associated to the user
       requestBody:
         content:
           application/json:
             schema:
+              description: Username
               type: string
+              minLength: 3
+              maxLength: 16
               example: jsanclemente
+              pattern: ˆ.*?$
       responses:
         '200':
-          description: OK
+          description: Returns the id of the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdUser'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -229,25 +274,33 @@ paths:
       operationId: uploadPhoto
       summary: Uploads a photo
       tags:
-        - uploadPhoto
+        - Photo
       description: Returns the identifier of a uploaded photo
       requestBody:
         content:
           multipart/form-data:
             schema:
               type: object
+              description: Represents a photo posted by user
               properties:
                 description:
                   type: string
+                  minLength: 0
+                  maxLength: 999999
                   description: Description of the image posted
                   example: Eating at the Eiffel Tower
+                  pattern: ˆ.*?$
                 image:
                   type: string
+                  description: image on binary format
                   format: binary
                 userName:
                   description: The username that posts the photo
                   type: string
+                  minLength: 0
+                  maxLength: 99999
                   example: jsanclemente
+                  pattern: ˆ.*?$
       responses:
         '201':
           description: Returns the id o a photo
@@ -272,7 +325,7 @@ paths:
       operationId: followUser
       summary: Follows a user
       tags:
-        - followUser
+        - Followers
       description: >-
         The user identified as "userId" follows the user identified as
         "followedId". Return the id of the followed user
@@ -280,14 +333,23 @@ paths:
         content:
           application/json:
             schema:
+              description: <follower> follows <followed>
               type: object
               properties:
                 follower:
+                  description: The users who make the action of follow other user
                   type: string
+                  minLength: 3
+                  maxLength: 16
                   example: jsanclee
+                  pattern: ˆ.*?$
                 followed:
+                  description: The user who recieves the action of being followed
                   type: string
+                  minLength: 3
+                  maxLength: 16
                   example: arturo_perez
+                  pattern: ˆ.*?$
       responses:
         '201':
           description: Returns the id of the followed user
@@ -306,7 +368,7 @@ paths:
       summary: Unfollows a user
       description: Returns the id of the unfollowed user
       tags:
-        - unfollowUser
+        - Followers
       responses:
         '200':
           description: Returns the id of the unfollowed user
@@ -330,7 +392,7 @@ paths:
       operationId: banUser
       summary: Bans a user
       tags:
-        - banUser
+        - Ban
       description: >-
         The user identified as "userId" bans the user identified "bannedId".
         Returns the id of the user banned
@@ -338,14 +400,23 @@ paths:
         content:
           application/json:
             schema:
+              description: <banner> bans <banned>
               type: object
               properties:
                 banner:
+                  description: User who makes the action of banning another user
                   type: string
+                  minLength: 3
+                  maxLength: 16
                   example: jsanclee
+                  pattern: ˆ.*?$
                 banned:
+                  description: User who recieves the action of being banned
                   type: string
+                  minLength: 3
+                  maxLength: 16
                   example: arturo_perez
+                  pattern: ˆ.*?$
       responses:
         '200':
           description: Returns the id of the banned user
@@ -362,7 +433,7 @@ paths:
     delete:
       operationId: unbanUser
       tags:
-        - unbanUser
+        - Ban
       summary: Unbans a user
       description: Return the id of the user unbanned
       responses:
@@ -389,7 +460,7 @@ paths:
       summary: Likes a photo of one user
       description: Likes a photo. Returns the number of likes of the photo after the "like"
       tags:
-        - likePhoto
+        - Like
       responses:
         '200':
           description: Number of likes of the post after the operation
@@ -410,7 +481,7 @@ paths:
         Unlikes a photo. Returns the number of likes of the photo after the
         dislike
       tags:
-        - unlikePhoto
+        - Like
       responses:
         '200':
           description: Number of likes of the post after the unlike
@@ -433,7 +504,7 @@ paths:
     put:
       operationId: commentPhoto
       tags:
-        - commentPhoto
+        - Comment
       description: >-
         Adds a comment for one post. Return the number of comments after the
         operation.
@@ -442,16 +513,23 @@ paths:
         content:
           application/json:
             schema:
+              description: <username> comments the text <comment>
               type: object
               properties:
                 userName:
                   description: name of the user who comments
                   type: string
+                  minLength: 3
+                  maxLength: 16
                   example: jsanclee
+                  pattern: ˆ.*?$
                 comment:
                   description: the comment of the post
                   type: string
+                  minLength: 0
+                  maxLength: 999999
                   example: lovely picture!
+                  pattern: ˆ.*?$
       responses:
         '200':
           description: Number of comments on the post after the comment
@@ -472,7 +550,7 @@ paths:
         Remove the comment of one post. Return the number of comments after the
         operation
       tags:
-        - uncommentPhoto
+        - Comment
       responses:
         '200':
           description: Number of comments on the post after the uncomment
@@ -487,19 +565,22 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
           
-  /photos/{userId}/{photoId}:
+  /photos/{photoId}:
     parameters:
-      - $ref: '#/components/parameters/UserID'
       - $ref: '#/components/parameters/PhotoId'
     delete:
       operationId: deletePhoto
       summary: Deletes a photo
       description: Delete a photo. Returns the id of the photo deleted
       tags:
-        - deletePhoto
+        - Photo
       responses:
         '200':
-          description: OK
+          description: Returns the photo id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdPhoto'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -516,7 +597,7 @@ paths:
         Gets the stream of the user. A stream is composed with photos posted by
         the users followed for this user.
       tags:
-        - getMyStream
+        - User
       responses:
         '200':
           description: List containing the valid stream for the user
@@ -538,7 +619,7 @@ paths:
     get:
       operationId: getUserProfile
       tags:
-        - getUserProfile
+        - User
       summary: Given a user returns the profile of the user
       responses:
         '200':

@@ -50,18 +50,6 @@ components:
       in: path
       required: true
       description: User ID
-    Username:
-      schema:
-        type: string
-        minLength: 3
-        maxLength: 16
-        example: jsanclemente
-        pattern: ˆ.*?$
-        readOnly: true
-      name: userName
-      in: path
-      required: true
-      description: Username of a user
     FollowedId:
       schema:
         type: integer
@@ -110,6 +98,7 @@ components:
           description: Array of followers of a determinated user
           items:
             type: integer
+            description: id of the user
             example: 56
         following:
           type: array
@@ -117,15 +106,19 @@ components:
           minItems: 0
           maxItems: 999999
           items:
+            description: Id of user
             type: integer
             example: 33
         nPhotos:
+          description: Number of posts posted by the user
           type: integer
           example: 78
         nFollowers:
+          description: Number of followers for the user
           type: integer
           example: 348928
         nFollowing:
+          description: Number of following for the user
           type: integer
           example: 9038939
           
@@ -173,6 +166,7 @@ components:
           minLength: 0
           maxLength: 999999
           example: jsanclemente
+          pattern: ˆ.*?$
         nComments:
           description: Number of comments associated to the photo
           type: integer
@@ -255,11 +249,16 @@ paths:
               pattern: ˆ.*?$
       responses:
         '200':
-          description: Returns the id of the user
+          description: Returns the old username for the user
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/IdUser'
+             schema:
+              description: Username
+              type: string
+              minLength: 3
+              maxLength: 16
+              example: jsanclemente
+              pattern: ˆ.*?$
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -267,9 +266,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
           
-  /photos/{userId}:
-    parameters:
-      - $ref: '#/components/parameters/UserID'
+  /photos:
     post:
       operationId: uploadPhoto
       summary: Uploads a photo
@@ -283,24 +280,16 @@ paths:
               type: object
               description: Represents a photo posted by user
               properties:
-                description:
-                  type: string
-                  minLength: 0
-                  maxLength: 999999
-                  description: Description of the image posted
-                  example: Eating at the Eiffel Tower
-                  pattern: ˆ.*?$
                 image:
                   type: string
-                  description: image on binary format
-                  format: binary
-                userName:
-                  description: The username that posts the photo
-                  type: string
+                  description: Image to post
                   minLength: 0
-                  maxLength: 99999
-                  example: jsanclemente
-                  pattern: ˆ.*?$
+                  maxLength: 999999
+                  format: binary
+                idUser:
+                  description: The username that posts the photo
+                  type: integer
+                  example: 55
       responses:
         '201':
           description: Returns the id o a photo
@@ -328,35 +317,16 @@ paths:
         - Followers
       description: >-
         The user identified as "userId" follows the user identified as
-        "followedId". Return the id of the followed user
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: <follower> follows <followed>
-              type: object
-              properties:
-                follower:
-                  description: The users who make the action of follow other user
-                  type: string
-                  minLength: 3
-                  maxLength: 16
-                  example: jsanclee
-                  pattern: ˆ.*?$
-                followed:
-                  description: The user who recieves the action of being followed
-                  type: string
-                  minLength: 3
-                  maxLength: 16
-                  example: arturo_perez
-                  pattern: ˆ.*?$
+        "followedId". Return the number of followed users by the user
       responses:
         '201':
-          description: Returns the id of the followed user
+          description: Returns the number of users followed by the user after the operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdUser'
+                description: Represent number of users followed
+                type: integer
+                example: 1234
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -366,16 +336,18 @@ paths:
     delete:
       operationId: unfollowUser
       summary: Unfollows a user
-      description: Returns the id of the unfollowed user
+      description: Returns the number of followed users by the user after the operation
       tags:
         - Followers
       responses:
         '200':
-          description: Returns the id of the unfollowed user
+          description: Returns the number of users followed by the user after the operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdUser'
+                description: Represent number of users followed
+                type: integer
+                example: 1234
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -395,35 +367,16 @@ paths:
         - Ban
       description: >-
         The user identified as "userId" bans the user identified "bannedId".
-        Returns the id of the user banned
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: <banner> bans <banned>
-              type: object
-              properties:
-                banner:
-                  description: User who makes the action of banning another user
-                  type: string
-                  minLength: 3
-                  maxLength: 16
-                  example: jsanclee
-                  pattern: ˆ.*?$
-                banned:
-                  description: User who recieves the action of being banned
-                  type: string
-                  minLength: 3
-                  maxLength: 16
-                  example: arturo_perez
-                  pattern: ˆ.*?$
+        Returns the number of users banned after the operation
       responses:
         '200':
-          description: Returns the id of the banned user
+          description: Returns the number of the banned users after the operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdUser'
+                description: Represent number of users banned
+                type: integer
+                example: 78
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -438,11 +391,13 @@ paths:
       description: Return the id of the user unbanned
       responses:
         '200':
-          description: Returns the id of the unbanned user
+          description: Returns the number of the banned users after the operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdUser'
+                description: Represent number of users banned
+                type: integer
+                example: 78
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -568,6 +523,13 @@ paths:
   /photos/{photoId}:
     parameters:
       - $ref: '#/components/parameters/PhotoId'
+      - in: query
+        name: userId
+        description: Id of the user
+        schema:
+          type: integer
+          description: id of the user that deletes the photo
+        required: true
     delete:
       operationId: deletePhoto
       summary: Deletes a photo

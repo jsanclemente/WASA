@@ -36,11 +36,19 @@ import (
 	"fmt"
 )
 
+var UserSubjectNotExists = errors.New("The user that starts the action doesn't exist")
+var UserPredicateNotExists = errors.New("The user that recieves the action doesn`t exists")
+var ErrPhotoNotExits = errors.New("The photo doesn't exists")
+var ErrCommentNotExists = errors.New("The comment doesn't exist")
+var ErrUser1alreadyFollows2 = errors.New("The user A is already following user B")
+var ErrorNotFollowing = errors.New("The user A doesn't follow user B")
+
 type User struct {
 	ID         uint64
 	username   string
-	followers []int
-	following []int
+	followers  []int
+	following  []int
+	posts      []int
 	nFollowers uint64
 	nFollowing uint64
 	nPosts     uint64
@@ -50,6 +58,8 @@ type Photo struct {
 	ID        uint64
 	nLikes    uint64
 	nComments uint64
+	date      string
+	comments  []uint64 //List of id's of all the comments for that photo
 	url       string
 }
 
@@ -73,22 +83,22 @@ type AppDatabase interface {
 	UnbanUser(unbanner uint64, unbanned uint64) (uint64, error)
 
 	// userName posts the image "url". Returns the id of the photo posted
-	UploadPhoto(url string, userName string) (uint64,error)
+	UploadPhoto(url string, idUser uint64) (uint64, error)
 
 	// Deletes the photo idPhoto. Returns the id of the deleted photo
-	DeletePhoto(idPhoto uint64)(uint64, error)
+	DeletePhoto(idUser uint64, idPhoto uint64) (uint64, error)
 
 	// The user "userId" likes the photo identified by "photoId". Returns the number of likes after the operation
 	LikePhoto(userId uint64, photoId uint64) (uint64, error)
-	
+
 	// The user identified by "userId" unlikes the photo identified by "photoId". Returns the number of likes after the operation
 	UnlikePhoto(userId uint64, photoId uint64) (uint64, error)
 
 	// The user identified by "userId" comments the description "comment" to the photo "photoId". Returns the number of comments after the operation
 	CommentPhoto(userId uint64, photoId uint64, comment string) (uint64, error)
 
-	// ??????
-	UncommentPhoto(userId uint64, photoId uint64, commentId uint64) (uint64, error)
+	// The user removes the "commentId" on photo "photoId"
+	UncommentPhoto(photoId uint64, commentId uint64) (uint64, error)
 
 	// The username associated to user "userId" changes to "username". Returns the old username.
 	SetMyUserName(userId uint64, username string) (string, error)
@@ -97,10 +107,16 @@ type AppDatabase interface {
 	GetMyStream(userId uint64) ([]Photo, error)
 
 	// Given an id for one user, returns the profile for that user.
-	GetUserProfile(userId uint64) (User, error) 
+	GetUserProfile(userId uint64) (User, error)
 
+	// Given an id for the user, checks if the user already exists
+	UserExists(userId uint64) bool
 
+	// If "follower" is following "followed" returns true, otherwise returns false
+	IsFollowing(follower uint64, followed uint64) bool
 
+	// If "photoId" returns true, otherwise returns false
+	PhotoExists(photoId uint64) bool
 
 	// Ping checks whether the database is available or not (in that case, an error will be returned)
 	Ping() error

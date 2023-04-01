@@ -9,17 +9,14 @@ func (db *appdbimpl) LikePhoto(userId uint64, photoId uint64) (uint64, error) {
 	// Introducir una nueva relacion en Likes
 	// Incrementar el nLikes en 1 de la foto
 
-	var idUser uint64
-	// 1. Check if the user exists
-	if err := db.c.QueryRow("SELECT id FROM Users where id = ?",
-		userId).Scan(&idUser); err != nil {
-		return 0, err
+	if !db.UserExists(userId) {
+		return 0, UserSubjectNotExists
 	}
 	// 2. User exists, now we have to check whether the photo does
 	var nLikes uint64
 	if err := db.c.QueryRow("SELECT nLikes FROM Photos where id = ?",
 		photoId).Scan(&nLikes); err != nil {
-		return 0, err
+		return 0, ErrPhotoNotExits
 	}
 	// 3. Both userId and photoId, exists
 	_, err := db.c.Exec(`INSERT INTO Likes (user_id,photo_id) VALUES (?, ?)`,

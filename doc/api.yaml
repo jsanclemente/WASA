@@ -50,6 +50,16 @@ components:
       in: path
       required: true
       description: User ID
+    CommentId:
+      schema:
+        type: integer
+        example: 1
+        readOnly: true
+      name: commentId
+      in: path
+      required: true
+      description: Comment id
+      
     FollowedId:
       schema:
         type: integer
@@ -121,12 +131,21 @@ components:
           description: Number of following for the user
           type: integer
           example: 9038939
-          
+        posts:
+          description: Posts for the user
+          type: array
+          minItems: 0
+          maxItems: 999999
+          items:
+            description: Id of photo
+            type: integer
+            example: 33
+            
+            
     IdUser:
       description: Id for a user in the app
       type: integer
       example: 89
-    
     IdPhoto:
       description: Photo identifier
       type: integer
@@ -153,29 +172,35 @@ components:
           type: integer
           description: Id of a photo
           example: 45
-        imageUrl:
+        url:
           description: Url of the image 
           type: string
           minLength: 0
           maxLength: 999999
           example: http://.../...
           pattern: ˆ.*?$
-        userName:
-          description: The username that posts the photo
-          type: string
-          minLength: 0
-          maxLength: 999999
-          example: jsanclemente
-          pattern: ˆ.*?$
         nComments:
           description: Number of comments associated to the photo
           type: integer
           example: 35
+        date: 
+          description: Date when the photo was posted
+          type: string
+          example: "23/7/2023"
+          pattern: ˆ.*?$
+        comments:
+          description: list of id's of all the comments for this photo
+          type: array
+          minItems: 0
+          maxItems: 999999
+          items:
+            type: integer
+            description: id of the comment
+            example: 56
         nLikes:
           description: Number of likes associated to the photo
           type: integer
           example: 23455
-          
     ListPhotos:
       description: Contains a list of schema "Photos"
       type: array
@@ -452,32 +477,27 @@ paths:
           $ref: '#/components/responses/InternalServerError'
           
           
-  /photos/{photoId}/comments/{userId}:
+  /photos/{photoId}/comments:
     parameters:
       - $ref: '#/components/parameters/PhotoId'
-      - $ref: '#/components/parameters/UserID'
-    put:
+    post:
       operationId: commentPhoto
       tags:
         - Comment
       description: >-
-        Adds a comment for one post. Return the number of comments after the
-        operation.
+        Adds a comment for one post. Return the number of comments after the operation.
       summary: Comment a photo
       requestBody:
         content:
           application/json:
             schema:
-              description: <username> comments the text <comment>
+              description: userId comments the text "comment"
               type: object
               properties:
-                userName:
-                  description: name of the user who comments
-                  type: string
-                  minLength: 3
-                  maxLength: 16
-                  example: jsanclee
-                  pattern: ˆ.*?$
+                userId:
+                  description: userId of the user who comments
+                  type: integer
+                  example: 67
                 comment:
                   description: the comment of the post
                   type: string
@@ -498,17 +518,21 @@ paths:
           description: User not found
         '500':
           $ref: '#/components/responses/InternalServerError'
+  
+  /photos/{photoId}/comments/{commentId}:
+    parameters:
+      - $ref: '#/components/parameters/PhotoId'
+      - $ref: '#/components/parameters/CommentId'
     delete:
+      summary: Remove the comment of one post
+      description: >
+        Remove the comment "commentId" of the photo "photoId"
       operationId: uncommentPhoto
-      summary: Uncomments a photo
-      description: >-
-        Remove the comment of one post. Return the number of comments after the
-        operation
       tags:
-        - Comment
+       - Comment
       responses:
         '200':
-          description: Number of comments on the post after the uncomment
+          description: Returns the number of comments after the operation
           content:
             application/json:
               schema:
@@ -519,6 +543,7 @@ paths:
           description: User not found
         '500':
           $ref: '#/components/responses/InternalServerError'
+  
           
   /photos/{photoId}:
     parameters:

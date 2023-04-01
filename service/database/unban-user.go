@@ -1,24 +1,15 @@
 package database
 
-import "database/sql"
-
 // "unbanner" bans user "unbanned". If everything is okey, returns the number of users unbanned for the user
 func (db *appdbimpl) UnbanUser(unbanner uint64, unbanned uint64) (uint64, error) {
-	var idUser uint64
-	if err := db.c.QueryRow("SELECT id FROM Users where id = ?",
-		unbanner).Scan(&idUser); err != nil { //Check if "unbanner" exists
-		if err == sql.ErrNoRows {
-			return 0, err
-		}
-		return 0, err
+
+	// Check if unbanner exists
+	if !db.UserExists(unbanner) {
+		return 0, UserSubjectNotExists
 	}
-	// "unbanner" exists. We have to check "unbanned"
-	if err := db.c.QueryRow("SELECT id FROM Users where id = ?",
-		unbanned).Scan(&idUser); err != nil {
-		if err == sql.ErrNoRows {
-			return 0, err
-		}
-		return 0, err
+	//Check if unbanned exists
+	if !db.UserExists(unbanned) {
+		return 0, UserPredicateNotExists
 	}
 
 	// At this point, both "unbanner" and "unbanned" exists. Delete on table Bans

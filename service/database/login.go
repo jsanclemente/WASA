@@ -4,7 +4,7 @@ import "database/sql"
 
 // Returns the id of the user, if the value returned is 0, something has gone wrong
 func (db *appdbimpl) Login(username string) (uint64, error) {
-	
+
 	var idUser uint64
 
 	if err := db.c.QueryRow("SELECT id FROM Users where username = ?",
@@ -19,11 +19,9 @@ func (db *appdbimpl) Login(username string) (uint64, error) {
 			if err != nil {
 				return 0, err
 			}
-
 			idUser = uint64(lastInsertID)
 			return idUser, nil
 		}
-		return 0, nil
 	}
 	return idUser, nil
 }

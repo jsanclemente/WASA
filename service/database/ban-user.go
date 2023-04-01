@@ -1,25 +1,14 @@
 package database
 
-import "database/sql"
-
 // "banner" bans user "banned". If everything is okey, returns the number of users banned for the user
-func (db *appdbimpl) BanUser(banner uint64, banned uint64) (uint64, error){
+func (db *appdbimpl) BanUser(banner uint64, banned uint64) (uint64, error) {
 
-	var idUser uint64
-	if err := db.c.QueryRow("SELECT id FROM Users where id = ?",
-		banner).Scan(&idUser); err != nil { //Check if "banner" exists
-		if err == sql.ErrNoRows {
-			return 0, err
-		}
-		return 0, err
+	//Check if banner and banned exists
+	if !db.UserExists(banner) {
+		return 0, UserSubjectNotExists
 	}
-	// "banner" exists. We have to check "banned"
-	if err := db.c.QueryRow("SELECT id FROM Users where id = ?",
-		banned).Scan(&idUser); err != nil {
-		if err == sql.ErrNoRows {
-			return 0, err
-		}
-		return 0, err
+	if !db.UserExists(banned) {
+		return 0, UserPredicateNotExists
 	}
 
 	// At this point, both "banner" and "banned" exists. Insert to table Bans
@@ -28,13 +17,6 @@ func (db *appdbimpl) BanUser(banner uint64, banned uint64) (uint64, error){
 	if err != nil {
 		return 0, err
 	}
-
-	// Comprobar si se siguen, para dejarse de seguir
-	// User banner stops following banned
-	db.UnfollowUser(banner,banned)
-	//Banned stops following 
-	db.UnfollowUser(banner,banned)
-
 
 	// Buscar el usuario banneador por el id, incrementar sus baneados
 	var nBans uint64
@@ -47,6 +29,15 @@ func (db *appdbimpl) BanUser(banner uint64, banned uint64) (uint64, error){
 		nBans, banner)
 	if err != nil {
 		return 0, err
+	}
+
+	//Si banner seguia a banned, dejarlo de seguir.
+	if db.IsFollowing(banner, banned) {
+		db.UnfollowUser(banner, banned)
+	}
+	//Si banned seguia a banner, que banned deje de seguirlo
+	if db.IsFollowing(banned, banner) {
+		db.UnfollowUser(banned, banner)
 	}
 
 	return nBans, nil

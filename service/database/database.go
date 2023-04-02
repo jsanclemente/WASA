@@ -45,13 +45,13 @@ var ErrorNotFollowing = errors.New("The user A doesn't follow user B")
 
 type User struct {
 	ID         uint64
-	username   string
-	followers  []int
-	following  []int
-	posts      []int
-	nFollowers uint64
-	nFollowing uint64
-	nPosts     uint64
+	Username   string
+	Followers  []int
+	Following  []int
+	Posts      []int
+	Nfollowers uint64
+	Nfollowing uint64
+	Nposts     uint64
 }
 
 type Photo struct {

@@ -62,7 +62,7 @@ func main() {
 func run() error {
 	rand.Seed(globaltime.Now().UnixNano())
 	// Load Configuration and defaults
-	cfg, err := loadConfiguration()
+	cfg, err := LoadConfiguration()
 	if err != nil {
 		if errors.Is(err, conf.ErrHelpWanted) {
 			return nil
@@ -121,14 +121,14 @@ func run() error {
 	}
 	router := apirouter.Handler()
 
-	router, err = registerWebUI(router)
+	router, err = RegisterWebUI(router)
 	if err != nil {
 		logger.WithError(err).Error("error registering web UI handler")
 		return fmt.Errorf("registering web UI handler: %w", err)
 	}
 
 	// Apply CORS policy
-	router = applyCORSHandler(router)
+	router = ApplyCORSHandler(router)
 
 	// Create the API server
 	apiserver := http.Server{

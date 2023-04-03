@@ -7,22 +7,22 @@ import "WASA/service/database"
 // Note: there is a similar struct in the database package. See Fountain.FromDatabase (below) to understand why.
 type User struct {
 	ID         uint64
-	username   string `json:"userName"`
-	followers  []int  `json:"followers"`
-	following  []int  `json:"following"`
-	posts      []int  `json:"posts"`
-	nFollowers uint64 `json:"nFollowers"`
-	nFollowing uint64 `json:"nFollowing"`
-	nPosts     uint64 `json:"nPhotos"`
+	Username   string `json:"userName"`
+	Followers  []int  `json:"followers"`
+	Following  []int  `json:"following"`
+	Posts      []int  `json:"posts"`
+	Nfollowers uint64 `json:"nFollowers"`
+	Nfollowing uint64 `json:"nFollowing"`
+	Nposts     uint64 `json:"nPhotos"`
 }
 
 type Photo struct {
 	ID        uint64   `json:"id"`
-	nLikes    uint64   `json:"nLikes"`
-	nComments uint64   `json:"nComments"`
-	date      string   `json:"date"`
-	comments  []uint64 `json:"comments"`
-	url       string   `json:"url"`
+	Nlikes    uint64   `json:"nLikes"`
+	Ncomments uint64   `json:"nComments"`
+	Date      string   `json:"date"`
+	Comments  []uint64 `json:"comments"`
+	Url       string   `json:"url"`
 }
 
 // FromDatabase populates the struct with data from the database, overwriting all values.
@@ -35,25 +35,25 @@ type Photo struct {
 // the database should somehow be JSON-serializable (or, in general, serializable).
 func (u *User) FromDatabase(user database.User) {
 	u.ID = user.ID
-	u.username = user.Username
-	u.followers = user.Followers
-	u.following = user.Following
-	u.posts = user.Posts
-	u.nFollowers = user.Nfollowers
-	u.nFollowing = user.Nfollowing
-	u.nPosts = user.Nposts
+	u.Username = user.Username
+	u.Followers = user.Followers
+	u.Following = user.Following
+	u.Posts = user.Posts
+	u.Nfollowers = user.Nfollowers
+	u.Nfollowing = user.Nfollowing
+	u.Nposts = user.Nposts
 }
 
 // ToDatabase returns the user in a database-compatible representation
 func (u *User) ToDatabase() database.User {
 	return database.User{
 		ID:         u.ID,
-		Username:   u.username,
-		Followers:  u.followers,
-		Following:  u.following,
-		Posts:      u.posts,
-		Nfollowers: u.nFollowers,
-		Nfollowing: u.nFollowing,
-		Nposts:     u.nPosts,
+		Username:   u.Username,
+		Followers:  u.Followers,
+		Following:  u.Following,
+		Posts:      u.Posts,
+		Nfollowers: u.Nfollowers,
+		Nfollowing: u.Nfollowing,
+		Nposts:     u.Nposts,
 	}
 }

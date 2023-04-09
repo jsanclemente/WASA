@@ -8,9 +8,10 @@ func (db *appdbimpl) UncommentPhoto(photoId uint64, commentId uint64) (uint64, e
 	// 1. Chequear si la foto existe
 	// 2. Chequear si el comentario existe
 	// 3. Extraer el userId de la relación "Comments"
-	// 4. Si y solo si se cumplen las condiciones 1 y 2:
-	// 4.1 Eliminar la relacion en Comments
-	// 4.2 Decrementear el nComments en 1 en la tabla Photos
+	// 4. Comprobar si el usuario ha comentado esa foto
+	// 5. Si y solo si se cumplen las condiciones 1 y 2:
+	// 5.1 Eliminar la relacion en Comments
+	// 5.2 Decrementear el nComments en 1 en la tabla Photos
 
 	// 1.
 	if !db.PhotoExists(photoId) {
@@ -19,8 +20,8 @@ func (db *appdbimpl) UncommentPhoto(photoId uint64, commentId uint64) (uint64, e
 	// 2.
 	var idComment uint64
 	var idUser uint64
-	if err := db.c.QueryRow("SELECT user_id, comment_id FROM Comments WHERE comment_id = ?",
-		commentId).Scan(&idUser, &idComment); err != nil {
+	if err := db.c.QueryRow("SELECT user_id, comment_id FROM Comments WHERE comment_id = ? AND photo_id = ?",
+		commentId, photoId).Scan(&idUser, &idComment); err != nil {
 		if err == sql.ErrNoRows {
 			return 0, ErrCommentNotExists
 		}

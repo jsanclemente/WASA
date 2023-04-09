@@ -5,6 +5,7 @@ import (
 	"WASA/service/database"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -15,21 +16,35 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	query := r.URL.Query()
 	idString := query.Get("userId")
 	userId, err := strconv.ParseUint(idString, 10, 64)
-	// The user id in the path is a 64-bit unsigned integer. Let's parse it.
+	fmt.Print(userId)
+	if err != nil {
+		// The value was not uint64, reject the action indicating an error on the client side.
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	// The user id in the path is a 64-bit unsigned integer. Let's parse photoId.
 	photoId, err := strconv.ParseUint(ps.ByName("photoId"), 10, 64)
+	fmt.Print(photoId)
 	if err != nil {
 		// The value was not uint64, reject the action indicating an error on the client side.
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	_, err = rt.db.DeletePhoto(userId, photoId)
+	id, err := rt.db.DeletePhoto(userId, photoId)
 	if errors.Is(err, database.UserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("The user that deletes the photo does not exist"))
+		return
+	}
+	if errors.Is(err, database.ErrNotHisPhoto) {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("You can't delete a photo you have not posted"))
 		return
 	}
 	if errors.Is(err, database.ErrPhotoNotExits) {
 		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("This photo does not exist"))
 		return
 	}
 	if err != nil {
@@ -41,5 +56,5 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 	// Send the output to the user.
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(photoId)
+	_ = json.NewEncoder(w).Encode(id)
 }

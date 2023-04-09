@@ -1,12 +1,7 @@
 package database
 
-import (
-	"fmt"
-	"time"
-)
-
 // userName posts the image "url". Returns the id of the photo posted. If something is wrong return the value 0.
-func (db *appdbimpl) UploadPhoto(url string, id uint64) (uint64, error) {
+func (db *appdbimpl) UploadPhoto(image []byte, id uint64) (uint64, error) {
 
 	// 1. Insertar la foto en la tabla "Photos". Inicialmente 0 likes y 0 comments
 	// 2. Insertar en la tabla Posts que el usuario id postea la foto idPhoto
@@ -19,8 +14,8 @@ func (db *appdbimpl) UploadPhoto(url string, id uint64) (uint64, error) {
 
 	var idPhoto uint64
 	// 1.
-	res, err := db.c.Exec(`INSERT INTO Photos (id, nLikes, nComments, url) VALUES (NULL, ?, ?, ?)`,
-		0, 0, url)
+	res, err := db.c.Exec(`INSERT INTO Photos (id, nLikes, nComments, imageData) VALUES (NULL, ?, ?, ?)`,
+		0, 0, image)
 	if err != nil {
 		return 0, err
 	}
@@ -30,12 +25,23 @@ func (db *appdbimpl) UploadPhoto(url string, id uint64) (uint64, error) {
 	}
 	idPhoto = uint64(lastInsertID)
 
-	t := time.Now()
-	date := fmt.Sprintf("%d-%02d-%02d", t.Year(), t.Month(), t.Day())
-	res, err = db.c.Exec(`INSERT INTO Posts (user_id,photo_id,date) VALUES (?, ?, ?)`,
-		id, idPhoto, date)
+	res, err = db.c.Exec(`INSERT INTO Posts (user_id,photo_id,date) VALUES (?, ?, datetime('now'))`,
+		id, idPhoto)
 	if err != nil {
 		return 0, err
 	}
+
+	// Increment number of posts
+	var nPosts uint64
+	if err := db.c.QueryRow("SELECT nPosts FROM Users where id = ?", id).
+		Scan(&nPosts); err != nil {
+		return 0, err
+	}
+	nPosts = nPosts + 1
+	_, err = db.c.Exec(`UPDATE Users SET nposts=? WHERE id=?`, nPosts, id)
+	if err != nil {
+		return 0, err
+	}
+
 	return idPhoto, nil
 }

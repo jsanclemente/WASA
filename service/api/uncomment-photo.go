@@ -11,7 +11,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) UncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	photoId, err := strconv.ParseUint(ps.ByName("photoId"), 10, 64)
 	if err != nil {
 		// The value was not uint64, reject the action indicating an error on the client side.
@@ -30,11 +30,13 @@ func (rt *_router) UncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	// Comment doesn't exists
 	if errors.Is(err, database.ErrCommentNotExists) {
 		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("The comment that you are trying to remove does not exist"))
 		return
 	}
 	// Photo doesn't exists
 	if errors.Is(err, database.ErrPhotoNotExits) {
 		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("This photo does not exist"))
 		return
 	}
 	if err != nil {

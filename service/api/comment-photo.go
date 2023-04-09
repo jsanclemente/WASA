@@ -11,6 +11,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+type CommentRequest struct {
+	UserId  uint64 `json:"userId"`
+	Comment string `json:"comment"`
+}
+
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	photoId, err := strconv.ParseUint(ps.ByName("photoId"), 10, 64)
 	if err != nil {
@@ -19,37 +24,31 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	var userId uint64
-	err = json.NewDecoder(r.Body).Decode(&userId)
+	var commentReq CommentRequest
+	err = json.NewDecoder(r.Body).Decode(&commentReq)
 	if err != nil {
 		// The body was not a parseable JSON, reject it
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	var comment string
-	err = json.NewDecoder(r.Body).Decode(&comment)
-	if err != nil {
-		// The body was not a parseable JSON, reject it
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	nComments, err := rt.db.CommentPhoto(userId, photoId, comment)
+	nComments, err := rt.db.CommentPhoto(commentReq.UserId, photoId, commentReq.Comment)
 	// User doesn't exists
 	if errors.Is(err, database.UserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("The user that comments the photo does not exist"))
 		return
 	}
 	// Photo doesn't exists
 	if errors.Is(err, database.ErrPhotoNotExits) {
 		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("You can't comment a photo that does not exist"))
 		return
 	}
 	if err != nil {
 		// In this case, we have an error on our side. Log the error (so we can be notified) and send a 500 to the user
 		// Note: we are using the "logger" inside the "ctx" (context) because the scope of this issue is the request.
-		ctx.Logger.WithError(err).WithField("user: ", userId).Error("can't comment the photo")
+		ctx.Logger.WithError(err).WithField("user: ", commentReq.UserId).Error("can't comment the photo")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -57,5 +56,4 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	// Send the output to the user.
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(nComments)
-
 }

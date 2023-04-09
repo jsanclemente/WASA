@@ -12,6 +12,10 @@ func (db *appdbimpl) UnbanUser(unbanner uint64, unbanned uint64) (uint64, error)
 		return 0, UserPredicateNotExists
 	}
 
+	if !db.IsBanned(unbanned, unbanner) {
+		return 0, ErrNotBanned
+	}
+
 	// At this point, both "unbanner" and "unbanned" exists. Delete on table Bans
 	_, err := db.c.Exec(`DELETE FROM Bans WHERE banner_id=? AND banned_id=?`,
 		unbanner, unbanned)

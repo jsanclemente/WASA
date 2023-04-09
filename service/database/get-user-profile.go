@@ -15,6 +15,8 @@ func (db *appdbimpl) GetUserProfile(userId uint64) (User, error) {
 		return User{}, err
 	}
 
+	user.ID = userId
+
 	// Obtener las publicaciones del usuario
 	rows, err := db.c.Query("SELECT photo_id FROM Posts WHERE user_id = ?", userId)
 	if err != nil {

@@ -168,17 +168,14 @@ components:
       description: Represents a photo on the application
       type: object
       properties:
-        idPhoto:
+        id:
           type: integer
           description: Id of a photo
           example: 45
-        url:
+        image:
           description: Url of the image 
           type: string
-          minLength: 0
-          maxLength: 999999
-          example: http://.../...
-          pattern: ˆ.*?$
+          format: binary
         nComments:
           description: Number of comments associated to the photo
           type: integer
@@ -230,7 +227,7 @@ paths:
               description: Username
               type: object
               properties:
-                name:
+                username:
                   description: name of the user
                   type: string
                   example: Maria
@@ -267,11 +264,15 @@ paths:
           application/json:
             schema:
               description: Username
-              type: string
-              minLength: 3
-              maxLength: 16
-              example: jsanclemente
-              pattern: ˆ.*?$
+              type: object
+              properties:
+                username:
+                  description: name of the user
+                  type: string
+                  example: Maria
+                  pattern: ˆ.*?$
+                  minLength: 3
+                  maxLength: 16
       responses:
         '200':
           description: Returns the old username for the user
@@ -354,6 +355,10 @@ paths:
                 example: 1234
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          description: userId is following a user which has banned userId
+        '409':
+          description: userId is already following followedId
         '404':
           description: User not found
         '500':
@@ -575,7 +580,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
           
-  /photos/{userId}/:
+  /feed/{userId}/:
     parameters:
       - $ref: '#/components/parameters/UserID'
     get:
@@ -600,7 +605,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
           
           
-  /users/{userId}/:
+  /users/{userId}/profile:
     parameters:
       - $ref: '#/components/parameters/UserID'
     get:

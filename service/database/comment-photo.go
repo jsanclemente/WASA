@@ -1,6 +1,9 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
 // The user identified by "userId" comments the description "comment" to the photo "photoId". Returns the number of comments after the operation.
 // If an error occurs, returns 0.
@@ -21,9 +24,10 @@ func (db *appdbimpl) CommentPhoto(userId uint64, photoId uint64, comment string)
 	}
 
 	// 3.1
-	_, err := db.c.Exec(`INSERT INTO Comments (user_id,photo_id,comment) VALUES (?, NULL, ?, ?)`,
+	_, err := db.c.Exec(`INSERT INTO Comments (user_id,photo_id,comment) VALUES (?, ?, ?)`,
 		userId, photoId, comment)
 	if err != nil {
+		fmt.Print("Error en el Insert")
 		return 0, err
 	}
 
@@ -37,6 +41,7 @@ func (db *appdbimpl) CommentPhoto(userId uint64, photoId uint64, comment string)
 	_, err = db.c.Exec(`UPDATE Photos SET nComments=? WHERE id=?`,
 		nComments+1, photoId)
 	if err != nil {
+		fmt.Print("Error en el Update")
 		return 0, err
 	}
 	return nComments + 1, nil

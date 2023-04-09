@@ -23,7 +23,12 @@ func (db *appdbimpl) UnlikePhoto(userId uint64, photoId uint64) (uint64, error) 
 			return 0, ErrPhotoNotExits
 		}
 	}
-	// 3. Both userId and photoId, exists, delete the row
+	// 3. Check of the user has liked the photo
+	if !db.UserLiked(userId, photoId) {
+		return 0, ErrNotHisLike
+	}
+
+	// 4. Both userId and photoId, exists, delete the row
 	_, err := db.c.Exec(`DELETE FROM Likes WHERE user_id=? AND photo_id=?`,
 		userId, photoId)
 	if err != nil {

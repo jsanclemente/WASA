@@ -29,6 +29,17 @@ func (db *appdbimpl) FollowUser(follower uint64, followed uint64) (uint64, error
 		return 0, err
 	}
 
+	if db.IsBanned(follower, followed) {
+		return 0, ErrUserAIsBanned
+	}
+	if db.IsBanned(followed, follower) {
+		return 0, ErrUserBIsBanned
+	}
+	// Check if "follower" already follows "followed"
+	if db.IsFollowing(follower, followed) {
+		return 0, ErrUser1alreadyFollows2
+	}
+
 	// At this point, both "follower" and "followed" exists. Insert to table Follows
 	_, err := db.c.Exec(`INSERT INTO Follows (follower_id,followed_id) VALUES (?, ?)`,
 		follower, followed)

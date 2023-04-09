@@ -23,6 +23,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 
 	if errors.Is(err, database.UserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("This user does not exist"))
 		return
 	}
 	if err != nil {

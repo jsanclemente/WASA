@@ -41,7 +41,14 @@ var UserPredicateNotExists = errors.New("The user that recieves the action doesn
 var ErrPhotoNotExits = errors.New("The photo doesn't exists")
 var ErrCommentNotExists = errors.New("The comment doesn't exist")
 var ErrUser1alreadyFollows2 = errors.New("The user A is already following user B")
-var ErrorNotFollowing = errors.New("The user A doesn't follow user B")
+var ErrNotFollowing = errors.New("The user A doesn't follow user B")
+var ErrUserAIsBanned = errors.New("The user A is banned by B")
+var ErrUserBIsBanned = errors.New("The user B is banned by A")
+var ErrAlreadyBanned = errors.New("The user is already banned")
+var ErrNotBanned = errors.New("The user you are trying to unban it's not banned")
+var ErrNotHisPhoto = errors.New("The user is trying to delete a post he hasn't posted")
+var ErrNotHisLike = errors.New("The user is trying to remove the like of a post he hasn't liked")
+var ErrUsernameAlreadyRegistered = errors.New("This username is already used")
 
 type User struct {
 	ID         uint64
@@ -56,11 +63,12 @@ type User struct {
 
 type Photo struct {
 	ID        uint64
-	nLikes    uint64
-	nComments uint64
-	date      string
-	comments  []uint64 //List of id's of all the comments for that photo
-	url       string
+	Image     []byte
+	Ncomments uint64
+	Date      string
+	Time      string
+	Comments  []uint64 //List of id's of all the comments for that photo
+	Nlikes    uint64
 }
 
 // AppDatabase is the high level interface for the DB
@@ -83,7 +91,7 @@ type AppDatabase interface {
 	UnbanUser(unbanner uint64, unbanned uint64) (uint64, error)
 
 	// userName posts the image "url". Returns the id of the photo posted
-	UploadPhoto(url string, idUser uint64) (uint64, error)
+	UploadPhoto(image []byte, idUser uint64) (uint64, error)
 
 	// Deletes the photo idPhoto. Returns the id of the deleted photo
 	DeletePhoto(idUser uint64, idPhoto uint64) (uint64, error)
@@ -118,6 +126,8 @@ type AppDatabase interface {
 	// If "photoId" returns true, otherwise returns false
 	PhotoExists(photoId uint64) bool
 
+	UserLiked(userId uint64, photoId uint64) bool
+
 	// Ping checks whether the database is available or not (in that case, an error will be returned)
 	Ping() error
 }
@@ -133,11 +143,16 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
 
+	_, err := db.Exec("PRAGMA foreign_keys = ON;")
+	if err != nil {
+		return nil, fmt.Errorf("enabling foreign key support: %w", err)
+	}
+
 	// Check if table USERS exists. If not, the database is empty, and we need to create the structure
 	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='Users';`).Scan(&tableName)
+	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='Users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE Users (id INT AUTO_INCREMENT PRIMARY KEY,
+		sqlStmt := `CREATE TABLE Users (id INTEGER PRIMARY KEY,
 			 username TEXT, nfollowers INTEGER NOT NULL, nfollowing INTEGER NOT NULL,
 			 nposts INTEGER NOT NULL, nbans INTEGER NOT NULL);`
 		_, err = db.Exec(sqlStmt)
@@ -149,8 +164,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 	// Check if table PHOTO exists. If not, the database is empty, and we need to create the structure
 	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='Photos';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE Photos (id INT AUTO_INCREMENT PRIMARY KEY,
-			 nLikes INTEGER NOT NULL, nComments INTEGER NOT NULL, url TEXT NOT NULL);`
+		sqlStmt := `CREATE TABLE Photos (id INTEGER PRIMARY KEY,
+			 nLikes INTEGER NOT NULL, nComments INTEGER NOT NULL, imageData BLOB NOT NULL);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure <Photos>: %w", err)
@@ -160,10 +175,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 	// Check if table COMMENTS exists. If not, the database is empty, and we need to create the structure
 	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='Comments';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE Comments (user_id INTEGER NOT NULL, comment_id INT AUTO_INCREMENT NOT NULL,
-			 photo_id INTEGER NOT NULL, comment TEXT NOT NULL,
-			PRIMARY KEY (user_id,comment_id,photo_id), FOREIGN KEY (user_id) REFERENCES Users(id),
-			FOREIGN KEY (photo_id) REFERENCES Photos(id) ON DELETE CASCADE);`
+		sqlStmt := `CREATE TABLE Comments (
+						user_id INTEGER NOT NULL,
+						comment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+			 			photo_id INTEGER  NOT NULL,
+						comment TEXT NOT NULL,
+						FOREIGN KEY (user_id) REFERENCES Users(id),
+						FOREIGN KEY (photo_id) REFERENCES Photos(id) ON DELETE CASCADE
+					);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure <Comments>: %w", err)
@@ -173,9 +192,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 	// Check if table POSTS exists. If not, the database is empty, and we need to create the structure
 	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='Posts';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE Posts (user_id INTEGER NOT NULL, photo_id INTEGER NOT NULL,
-			date DATE, PRIMARY KEY(user_id,photo_id), FOREIGN KEY (user_id) REFERENCES Users(id),
-			FOREIGN KEY (photo_id) REFERENCES Photos(id) ON DELETE CASCADE);`
+		sqlStmt := `CREATE TABLE Posts (photo_id INTEGER NOT NULL, user_id INTEGER NOT NULL,
+			date DATETIME, PRIMARY KEY(user_id,photo_id), FOREIGN KEY (photo_id) REFERENCES Photos(id) ON DELETE CASCADE, 
+			FOREIGN KEY (user_id) REFERENCES Users(id));`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure <Posts>: %w", err)

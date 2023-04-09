@@ -10,7 +10,7 @@ func (db *appdbimpl) Login(username string) (uint64, error) {
 	if err := db.c.QueryRow("SELECT id FROM Users where username = ?",
 		username).Scan(&idUser); err != nil {
 		if err == sql.ErrNoRows {
-			res, err := db.c.Exec(`INSERT INTO Users (id, username, nfollowers, nfollowing, nposts, nabans) VALUES (NULL, ?, ?, ?, ?, ?)`,
+			res, err := db.c.Exec(`INSERT INTO Users (id, username, nfollowers, nfollowing, nposts, nbans) VALUES (NULL, ?, ?, ?, ?, ?)`,
 				username, 0, 0, 0, 0)
 			if err != nil {
 				return 0, err

@@ -30,16 +30,19 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 	nfollowers, err := rt.db.UnfollowUser(userId, followedId)
 	if errors.Is(err, database.UserSubjectNotExists) {
-		// The fountain (indicated by `id`) does not exist, reject the action indicating an error on the client side.
+		// The user (indicated by `id`) does not exist, reject the action indicating an error on the client side.
 		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("This user don't exists"))
 		return
 	}
 	if errors.Is(err, database.UserPredicateNotExists) {
 		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("The user you are trying to unfollow does not exist "))
 		return
 	}
-	if errors.Is(err, database.ErrUser1alreadyFollows2) {
-		w.WriteHeader(http.StatusBadRequest)
+	if errors.Is(err, database.ErrNotFollowing) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("You can't unfollow a user that you are not following"))
 		return
 	}
 	if err != nil {

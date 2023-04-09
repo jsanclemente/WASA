@@ -8,18 +8,21 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+type LoginRequest struct {
+	Username string `json:"username"`
+}
+
 func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	var username string
-	err := json.NewDecoder(r.Body).Decode(&username)
+	var loginReq LoginRequest
+	err := json.NewDecoder(r.Body).Decode(&loginReq)
 	if err != nil {
 		// The body was not a parseable JSON, reject it
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	// Create the fountain in the database. Note that this function will return a new instance of the fountain with the
-	// same information, plus the ID.
-	id, err := rt.db.Login(username)
+	// Hacer el login
+	id, err := rt.db.Login(loginReq.Username)
 	if err != nil {
 		// In this case, we have an error on our side. Log the error (so we can be notified) and send a 500 to the user
 		// Note: we are using the "logger" inside the "ctx" (context) because the scope of this issue is the request.

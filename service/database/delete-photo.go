@@ -1,5 +1,7 @@
 package database
 
+import "fmt"
+
 // Deletes the photo idPhoto. Returns the id of the deleted photo
 // If an error occurs, returns 0
 func (db *appdbimpl) DeletePhoto(idUser uint64, idPhoto uint64) (uint64, error) {
@@ -15,11 +17,18 @@ func (db *appdbimpl) DeletePhoto(idUser uint64, idPhoto uint64) (uint64, error) 
 		return 0, ErrPhotoNotExits
 	}
 
+	if !db.OwnsPhoto(idUser, idPhoto) {
+		return 0, ErrNotHisPhoto
+	}
+
 	// Esta sentencia borra en la tabla Posts, Likes, Comments gracias al ON DELETE CASCADE
 	_, err := db.c.Exec(`DELETE FROM Photos WHERE id=?`, idPhoto)
 	if err != nil {
+		fmt.Print("Error en el DELETE de Photos")
 		return 0, err
 	}
+	fmt.Print("Borrado la foto")
+
 	var nPosts uint64
 	if err := db.c.QueryRow("SELECT nPosts FROM Users where id = ?", idUser).Scan(&nPosts); err != nil {
 		return 0, err

@@ -15,7 +15,7 @@ func (db *appdbimpl) UnfollowUser(unfollower uint64, unfollowed uint64) (uint64,
 
 	// At this point, both "unfollower" and "unfollowed" exists. Delete on table Follows
 	if !db.IsFollowing(unfollower, unfollowed) {
-		return 0, ErrUser1alreadyFollows2
+		return 0, ErrNotFollowing
 	}
 	_, err := db.c.Exec(`DELETE FROM Follows WHERE follower_id=? AND followed_id=?`,
 		unfollower, unfollowed)

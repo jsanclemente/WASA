@@ -35,7 +35,7 @@ type WebAPIConfiguration struct {
 // configuration file (specified in WebAPIConfiguration.Config.Path).
 // So, CLI parameters will override the environment, and configuration file will override everything.
 // Note that the configuration file can be specified only via CLI or environment variable.
-func LoadConfiguration() (WebAPIConfiguration, error) {
+func loadConfiguration() (WebAPIConfiguration, error) {
 	var cfg WebAPIConfiguration
 
 	// Try to load configuration from environment variables and command line switches

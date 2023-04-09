@@ -11,6 +11,11 @@ func (db *appdbimpl) BanUser(banner uint64, banned uint64) (uint64, error) {
 		return 0, UserPredicateNotExists
 	}
 
+	//Chequear if "banned" is already banned by "banner"
+	if db.IsBanned(banned, banner) {
+		return 0, ErrAlreadyBanned
+	}
+
 	// At this point, both "banner" and "banned" exists. Insert to table Bans
 	_, err := db.c.Exec(`INSERT INTO Bans (banner_id,banned_id) VALUES (?, ?)`,
 		banner, banned)

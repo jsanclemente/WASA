@@ -7,6 +7,7 @@ import "database/sql"
 
 func (db *appdbimpl) SetMyUserName(userId uint64, username string) (string, error) {
 	// 1.Comprobar que existe el usuario
+	// 2. Comprobar que el username no coincide con ninguno ya creado
 	// 1.1 Si existe modificar el campo y devolver el antiguo
 
 	// 1.
@@ -16,6 +17,11 @@ func (db *appdbimpl) SetMyUserName(userId uint64, username string) (string, erro
 		if err == sql.ErrNoRows {
 			return "", UserSubjectNotExists
 		}
+	}
+
+	// 2. Comprobar que el username no coincide con ninguno ya creado
+	if !db.IsValid(username) {
+		return "", ErrUsernameAlreadyRegistered
 	}
 
 	_, err := db.c.Exec(`UPDATE Users SET username=? WHERE id=?`,

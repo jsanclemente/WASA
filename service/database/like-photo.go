@@ -1,5 +1,9 @@
 package database
 
+import (
+	"fmt"
+)
+
 // The user "userId" likes the photo identified by "photoId". Returns the number of likes after the operation
 func (db *appdbimpl) LikePhoto(userId uint64, photoId uint64) (uint64, error) {
 
@@ -19,9 +23,15 @@ func (db *appdbimpl) LikePhoto(userId uint64, photoId uint64) (uint64, error) {
 		return 0, ErrPhotoNotExits
 	}
 	// 3. Both userId and photoId, exists
+	// Check the "userId" doesn't like a photo twice
+	if db.AlreadyLiked(userId, photoId) {
+		return 0, ErrPhotoAlreadyLiked
+	}
+
 	_, err := db.c.Exec(`INSERT INTO Likes (user_id,photo_id) VALUES (?, ?)`,
 		userId, photoId)
 	if err != nil {
+		fmt.Print("error en el insert en likes\n")
 		return 0, err
 	}
 	// Update the value of nLikes of that photo
@@ -30,5 +40,6 @@ func (db *appdbimpl) LikePhoto(userId uint64, photoId uint64) (uint64, error) {
 	if err != nil {
 		return 0, err
 	}
+	fmt.Print("Llego al update \n")
 	return nLikes + 1, nil
 }

@@ -25,7 +25,7 @@ func (db *appdbimpl) UploadPhoto(image []byte, id uint64) (uint64, error) {
 	}
 	idPhoto = uint64(lastInsertID)
 
-	res, err = db.c.Exec(`INSERT INTO Posts (user_id,photo_id,date) VALUES (?, ?, datetime('now'))`,
+	res, err = db.c.Exec(`INSERT INTO Posts (user_id,photo_id,date) VALUES (?, ?, datetime('now','localtime'))`,
 		id, idPhoto)
 	if err != nil {
 		return 0, err

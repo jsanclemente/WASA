@@ -18,12 +18,20 @@ type User struct {
 
 type Photo struct {
 	ID        uint64   `json:"id"`
+	Username  string   `json:"username"`
 	Image     []byte   `json:"image"`
 	Ncomments uint64   `json:"nComments"`
 	Date      string   `json:"date"`
 	Time      string   `json:"time"`
 	Comments  []uint64 `json:"comments"`
+	Likes     []uint64 `json:"likes"`
 	Nlikes    uint64   `json:"nLikes"`
+}
+
+type Comment struct {
+	IdComment uint64 `json:"idComment"`
+	Username  string `json:"username"`
+	Comment   string `json:"comment"`
 }
 
 // FromDatabase populates the struct with data from the database, overwriting all values.
@@ -61,22 +69,26 @@ func (u *User) ToDatabase() database.User {
 
 func (p *Photo) FromDatabase(photo database.Photo) {
 	p.ID = photo.ID
+	p.Username = photo.Username
 	p.Image = photo.Image
 	p.Ncomments = photo.Ncomments
 	p.Date = photo.Date
 	p.Time = photo.Time
 	p.Comments = photo.Comments
+	p.Likes = photo.Likes
 	p.Nlikes = photo.Nlikes
 }
 
 func (p *Photo) ToDatabase() database.Photo {
 	return database.Photo{
 		ID:        p.ID,
+		Username:  p.Username,
 		Image:     p.Image,
 		Ncomments: p.Ncomments,
 		Date:      p.Date,
 		Time:      p.Time,
 		Comments:  p.Comments,
+		Likes:     p.Likes,
 		Nlikes:    p.Nlikes,
 	}
 }

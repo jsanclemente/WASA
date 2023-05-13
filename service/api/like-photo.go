@@ -5,6 +5,7 @@ import (
 	"WASA/service/database"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -13,6 +14,7 @@ import (
 
 func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	photoId, err := strconv.ParseUint(ps.ByName("photoId"), 10, 64)
+	fmt.Println("PhotoId: ", photoId)
 	if err != nil {
 		// The value was not uint64, reject the action indicating an error on the client side.
 		w.WriteHeader(http.StatusBadRequest)
@@ -20,6 +22,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	userId, err := strconv.ParseUint(ps.ByName("userId"), 10, 64)
+	fmt.Println("UserId: ", userId)
 	if err != nil {
 		// The value was not uint64, reject the action indicating an error on the client side.
 		w.WriteHeader(http.StatusBadRequest)
@@ -30,6 +33,11 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	if errors.Is(err, database.UserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("The user that starts the action does not exist"))
+		return
+	}
+	if errors.Is(err, database.ErrPhotoAlreadyLiked) {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("You can't like a photo twice"))
 		return
 	}
 	if errors.Is(err, database.ErrPhotoNotExits) {

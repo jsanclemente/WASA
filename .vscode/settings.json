@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "socket.h": "c"
-    }
+    },
+    "git.ignoreLimitWarning": true
 }

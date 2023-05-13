@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -35,9 +34,6 @@ func (db *appdbimpl) GetMyStream(userId uint64) ([]Photo, error) {
 		followedUsers = append(followedUsers, followedUser)
 	}
 
-	fmt.Print(followedUsers)
-	fmt.Print("\n")
-
 	if rr := rows.Err(); rr != nil {
 		return nil, nil
 	}
@@ -50,13 +46,23 @@ func (db *appdbimpl) GetMyStream(userId uint64) ([]Photo, error) {
 		if err != nil {
 			return nil, err
 		}
-
 		defer func() { _ = rows.Close() }()
+
+		var username string
+
+		// Extract the username
+		if err := db.c.QueryRow("SELECT username FROM Users where id = ?",
+			followedUser).Scan(&username); err != nil {
+			return nil, err
+		}
 
 		// Para cada publicacion, obtener sus campos
 		var post Photo
+		post.Username = username
 		for rows.Next() {
 			post.Comments = nil
+			post.Likes = nil
+
 			if err := rows.Scan(&post.ID, &post.Nlikes, &post.Ncomments, &post.Image, &post.Date); err != nil {
 				return nil, err
 			}
@@ -72,8 +78,23 @@ func (db *appdbimpl) GetMyStream(userId uint64) ([]Photo, error) {
 				return nil, err
 			}
 
+			//	Obtener los id's de los usuarios que han dado like para cada publicación
+			rows, err := db.c.Query("SELECT user_id FROM Likes WHERE photo_id = ?", post.ID)
+			if err != nil {
+				return nil, err
+			}
+			defer rows.Close()
+
+			for rows.Next() {
+				var user uint64
+				if err := rows.Scan(&user); err != nil {
+					return nil, err
+				}
+				post.Likes = append(post.Likes, user)
+			}
+
 			// Se obtienen los id's de los comentarios para cada publicación
-			rows, err := db.c.Query("SELECT comment_id FROM Comments WHERE photo_id=?", post.ID)
+			rows, err = db.c.Query("SELECT comment_id FROM Comments WHERE photo_id=?", post.ID)
 			if err != nil {
 				return nil, err
 			}

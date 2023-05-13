@@ -49,6 +49,7 @@ var ErrNotBanned = errors.New("The user you are trying to unban it's not banned"
 var ErrNotHisPhoto = errors.New("The user is trying to delete a post he hasn't posted")
 var ErrNotHisLike = errors.New("The user is trying to remove the like of a post he hasn't liked")
 var ErrUsernameAlreadyRegistered = errors.New("This username is already used")
+var ErrPhotoAlreadyLiked = errors.New("You can't like a photo twice")
 
 type User struct {
 	ID         uint64
@@ -62,13 +63,21 @@ type User struct {
 }
 
 type Photo struct {
-	ID        uint64
+	ID        uint64 //	Id of the photo
+	Username  string //	Username of the user that posts the photo
 	Image     []byte
 	Ncomments uint64
 	Date      string
 	Time      string
-	Comments  []uint64 //List of id's of all the comments for that photo
+	Comments  []uint64 //	List of id's of all the comments for that photo
+	Likes     []uint64 //	List of id's of users that liked the photo
 	Nlikes    uint64
+}
+
+type Comment struct {
+	IdComment uint64
+	Username  string // User that comments the photo
+	Comment   string
 }
 
 // AppDatabase is the high level interface for the DB
@@ -127,6 +136,8 @@ type AppDatabase interface {
 	PhotoExists(photoId uint64) bool
 
 	UserLiked(userId uint64, photoId uint64) bool
+
+	GetComments(photoId uint64) ([]Comment, error)
 
 	// Ping checks whether the database is available or not (in that case, an error will be returned)
 	Ping() error

@@ -10,10 +10,10 @@
                 </h6>
                 <ul class="nav flex-column">
                     <li class="nav-item text-thin">
-                        <div to="home"  class="nav-link text-thin">
+                        <RouterLink to="home"  class="nav-link text-thin">
                             <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
                             Home
-                        </div>
+                        </RouterLink>
                     </li>
                     <li class="nav-item">
                         <button type="button" class="nav-link text-thin btn border-0" data-bs-toggle="modal" data-bs-target="#modalSearch">

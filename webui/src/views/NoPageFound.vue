@@ -1,6 +1,6 @@
 <template>
     <div>
-        <img alt="Vue logo" src="../../public/logo.png">
+        <img alt="Vue logo" src="/logo.png">
         <h1>No page found</h1>
         <h3>404</h3>
     </div>

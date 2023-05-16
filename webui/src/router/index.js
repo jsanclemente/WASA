@@ -15,13 +15,15 @@ const router = createRouter({
 			component: () => import('../views/MyAccountLayout.vue'),
 			children: [
 				{
-					path: 'home',
+					path: '/myAccount/home',
 					component: () => import('../views/HomeView.vue'),
 					name: 'home'
 				},
 				{
-					path: 'profile',
-					component: () => import('../views/ProfileView.vue')
+					path: '/myAccount/profile/:id',
+					component: () => import('../views/ProfileView.vue'),
+					name: 'profile',
+					props: true
 				}	
 			]
 		},

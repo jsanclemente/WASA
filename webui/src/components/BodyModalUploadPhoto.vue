@@ -1,7 +1,7 @@
 <template>
     <div class="mb-3">
         <div class="d-flex" v-if="!photoUploaded">
-            <input type="file" @change="previewImage" class="form-control-input">
+            <input type="file" ref="input" @change="previewImage" class="form-control-input">
             <button v-if="image" class="delete-button d-flex justify-content-end" @click="clearImage">
                 <i class="material-symbols-outlined">delete</i>
             </button>
@@ -83,6 +83,7 @@ export default {
                 this.showSuccessMsg()
             }   
             catch(error){
+                console.log(error)
                 //  Show error message
                 this.showErrorMsg()
             }

@@ -39,6 +39,8 @@
 <script>
 export default {
 
+	props: ['id'],
+
 	data() {
 		return {
 			username: "",
@@ -50,8 +52,8 @@ export default {
 
 	async created(){
 		try {
-			const id = parseInt(localStorage.getItem('userId'))
-			let response = await this.$axios.get("/users/"+ id + "/profile")
+			console.log(this.id)
+			let response = await this.$axios.get("/users/"+ this.id + "/profile")
 			this.username = response.data.Username
 			this.nPosts = response.data.Nposts
 			this.nFollowers = response.data.Nfollowers

@@ -22,7 +22,7 @@
                         </button>
                     </li>
                     <li class="nav-item">
-                        <RouterLink to="profile" class="nav-link text-thin">
+                        <RouterLink :to="{ name: 'profile', params: { id: this.id }, props: true }" class="nav-link text-thin">
                             <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#user"/></svg>
                             Profile
                         </RouterLink>
@@ -74,6 +74,13 @@
 </template>
 
 <script>
+export default {
+    data() {
+        return {
+            id: parseInt(localStorage.getItem('userId'))
+        };
+  },
+}
 
 </script>
 

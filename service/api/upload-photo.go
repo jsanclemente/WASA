@@ -5,7 +5,6 @@ import (
 	"WASA/service/database"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -25,7 +24,6 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	userId, _ := strconv.ParseUint(r.FormValue("userId"), 10, 64)
 	image, _, err := r.FormFile("image")
 	if err != nil {
-		fmt.Print("Error en el segundo print")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -39,7 +37,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	idPhoto, err := rt.db.UploadPhoto(imageBytes, userId)
-	if errors.Is(err, database.UserSubjectNotExists) {
+	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("The user that uploads the photo does not exist"))
 		return

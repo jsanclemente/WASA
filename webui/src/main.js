@@ -11,6 +11,8 @@ import Post from './components/Post.vue'
 import BodyModal from './components/BodyModal.vue'
 import Comment from './components/Comment.vue'
 import BodyModalUploadPhoto from './components/BodyModalUploadPhoto.vue'
+import SuccessMsg from './components/SuccessMsg.vue'
+import ModalSearch from './components/ModalSearch.vue'
 
 
 
@@ -24,10 +26,12 @@ const app = createApp(App)
 app.config.globalProperties.$axios = axios;
 app.component("ErrorMsg", ErrorMsg);
 app.component("LoadingSpinner", LoadingSpinner)
+app.component("SuccessMsg",SuccessMsg)
 app.component("Post",Post)
 app.component("BodyModal",BodyModal)
 app.component("Comment",Comment)
 app.component("ModalUpload", BodyModalUploadPhoto)
+app.component("ModalSearch",ModalSearch)
 app.component("fa",FontAwesomeIcon)
 app.use(router)
 app.mount('#app')

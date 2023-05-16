@@ -141,6 +141,20 @@ components:
             type: integer
             example: 33
             
+    Usuario:
+      description: Object for the searchUser operation
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id of the user
+          example: 45
+        username:
+          type: string
+          description: Username of the user on the app
+          example: "Jorge"
+          pattern: ˆ.*?$
+          
             
     IdUser:
       description: Id for a user in the app
@@ -172,6 +186,11 @@ components:
           type: integer
           description: Id of a photo
           example: 45
+        username:
+          type: string
+          description: Username of the user that posts the photo
+          example: "jorge_21"
+          pattern: ˆ.*?$
         image:
           description: Url of the image 
           type: string
@@ -210,6 +229,14 @@ security:
   - bearerAuth: []      
 paths:
   /users:
+    parameters:
+      - in: query
+        name: username
+        description: String to search the user
+        schema:
+          type: string
+          description: username 
+        required: true
     post:
       tags:
         - doLogin
@@ -236,7 +263,7 @@ paths:
                   maxLength: 16
         required: true
       responses:
-        '201':
+        '200':
           description: User id
           content:
             application/json:
@@ -244,8 +271,25 @@ paths:
                 $ref: '#/components/schemas/IdUser'
         '400':
           $ref: '#/components/responses/BadRequest'
-        '404':
-          description: User not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      operationId: searchUser
+      tags:
+        - User
+      summary: Given a string, returns the user that starts with the same string
+      responses:
+        '200':
+          description: Returns an array of users(username, id).
+          content:
+            application/json:
+              schema:
+                type: array
+                description: array uf users
+                items:
+                  $ref: '#/components/schemas/Usuario'
+        '400': 
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalServerError'
           
@@ -626,3 +670,7 @@ paths:
           description: User not found
         '500':
           $ref: '#/components/responses/InternalServerError'
+    
+      
+      
+      

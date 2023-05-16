@@ -6,7 +6,7 @@ func (db *appdbimpl) GetUserProfile(userId uint64) (User, error) {
 
 	// 1.Check if the user exists
 	if !db.UserExists(userId) {
-		return User{}, UserSubjectNotExists
+		return User{}, ErrUserSubjectNotExists
 	}
 
 	var user User

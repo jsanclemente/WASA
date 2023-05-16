@@ -16,7 +16,7 @@ func (db *appdbimpl) FollowUser(follower uint64, followed uint64) (uint64, error
 	if err := db.c.QueryRow("SELECT id FROM Users where id = ?",
 		follower).Scan(&idUser); err != nil { //Check if "follower" exists
 		if err == sql.ErrNoRows {
-			return 0, UserSubjectNotExists
+			return 0, ErrUserSubjectNotExists
 		}
 		return 0, err
 	}
@@ -24,7 +24,7 @@ func (db *appdbimpl) FollowUser(follower uint64, followed uint64) (uint64, error
 	if err := db.c.QueryRow("SELECT id FROM Users where id = ?",
 		followed).Scan(&idUser); err != nil {
 		if err == sql.ErrNoRows {
-			return 0, UserPredicateNotExists
+			return 0, ErrUserPredicateNotExists
 		}
 		return 0, err
 	}

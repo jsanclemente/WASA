@@ -36,8 +36,8 @@ import (
 	"fmt"
 )
 
-var UserSubjectNotExists = errors.New("The user that starts the action doesn't exist")
-var UserPredicateNotExists = errors.New("The user that recieves the action doesn`t exists")
+var ErrUserSubjectNotExists = errors.New("The user that starts the action doesn't exist")
+var ErrUserPredicateNotExists = errors.New("The user that recieves the action doesn`t exists")
 var ErrPhotoNotExits = errors.New("The photo doesn't exists")
 var ErrCommentNotExists = errors.New("The comment doesn't exist")
 var ErrUser1alreadyFollows2 = errors.New("The user A is already following user B")
@@ -138,6 +138,8 @@ type AppDatabase interface {
 	UserLiked(userId uint64, photoId uint64) bool
 
 	GetComments(photoId uint64) ([]Comment, error)
+
+	SearchUser(username string) ([]User, error)
 
 	// Ping checks whether the database is available or not (in that case, an error will be returned)
 	Ping() error

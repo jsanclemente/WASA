@@ -11,17 +11,17 @@
 			}
 		},
 
-		async created(){
+		async mounted(){
 			try {
 				const id = parseInt(localStorage.getItem('userId'));
 				let response = await this.$axios.get("/feed/"+ id)
-				console.log(response.data)
+				this.posts = response.data
+				
 				if(response.data === null){
 					this.streamEmpty = true
 					return
 				}
 
-				this.posts = response.data
 				for (let i = 0; i < this.posts.length; i++) {
 					const imageData = this.posts[i].Image; // Suponiendo que `post` es un objeto que contiene los datos binarios de la imagen
 					const imageUrl = URL.createObjectURL(new Blob([imageData]));
@@ -81,10 +81,10 @@
         					</div>
 						</Post>		
 					</div>
-					<div v-if="streamEmpty" class="main">
-						<h1 class="text-white">To see your feed you have to follow users or wait them to post any photo!</h1>
-					</div>
 				</div>  
+				<div v-if="streamEmpty">
+					<h1 class="text-white">To see your feed you have to follow users or wait them to post any photo!</h1>
+				</div>
 			</div>
 		</div>
 	</div>

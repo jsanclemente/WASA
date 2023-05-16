@@ -31,7 +31,7 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	oldUsername, err := rt.db.SetMyUserName(userId, request.Username)
-	if errors.Is(err, database.UserSubjectNotExists) {
+	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("The user that starts the action does not exist"))
 		return

@@ -27,7 +27,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	nlikes, err := rt.db.UnlikePhoto(userId, photoId)
-	if errors.Is(err, database.UserSubjectNotExists) {
+	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("The user that unlikes the photo does not exist"))
 		return

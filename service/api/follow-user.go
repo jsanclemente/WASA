@@ -30,7 +30,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 	//Creo que el error esta en esta funcion
 	nfollowers, err := rt.db.FollowUser(userId, followedId)
-	if errors.Is(err, database.UserSubjectNotExists) {
+	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		// The user (indicated by `id`) does not exist, reject the action indicating an error on the client side.
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("The user that do the follow action don't exists"))
@@ -51,7 +51,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		w.Write([]byte("You can't follow a user you have already banned"))
 		return
 	}
-	if errors.Is(err, database.UserPredicateNotExists) {
+	if errors.Is(err, database.ErrUserPredicateNotExists) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("The user you are trying to follow doesn't exists"))
 		return

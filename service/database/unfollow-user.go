@@ -6,11 +6,11 @@ func (db *appdbimpl) UnfollowUser(unfollower uint64, unfollowed uint64) (uint64,
 
 	//Check if unfollower exists
 	if !db.UserExists(unfollower) {
-		return 0, UserSubjectNotExists
+		return 0, ErrUserSubjectNotExists
 	}
 	//Check if unfollowed exists
 	if !db.UserExists(unfollowed) {
-		return 0, UserPredicateNotExists
+		return 0, ErrUserPredicateNotExists
 	}
 
 	// At this point, both "unfollower" and "unfollowed" exists. Delete on table Follows

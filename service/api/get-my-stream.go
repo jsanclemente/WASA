@@ -21,7 +21,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	var posts []database.Photo
 	posts, err = rt.db.GetMyStream(userId)
 
-	if errors.Is(err, database.UserSubjectNotExists) {
+	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("This user does not exist"))
 		return

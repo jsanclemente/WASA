@@ -5,10 +5,10 @@ func (db *appdbimpl) BanUser(banner uint64, banned uint64) (uint64, error) {
 
 	//Check if banner and banned exists
 	if !db.UserExists(banner) {
-		return 0, UserSubjectNotExists
+		return 0, ErrUserSubjectNotExists
 	}
 	if !db.UserExists(banned) {
-		return 0, UserPredicateNotExists
+		return 0, ErrUserPredicateNotExists
 	}
 
 	//Chequear if "banned" is already banned by "banner"

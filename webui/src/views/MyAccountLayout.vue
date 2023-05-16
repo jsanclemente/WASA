@@ -10,29 +10,29 @@
                 </h6>
                 <ul class="nav flex-column">
                     <li class="nav-item text-thin">
-                        <div  class="nav-link text-thin">
+                        <div to="home"  class="nav-link text-thin">
                             <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
                             Home
                         </div>
                     </li>
                     <li class="nav-item">
-                        <RouterLink to="/link1" class="nav-link text-thin">
+                        <button type="button" class="nav-link text-thin btn border-0" data-bs-toggle="modal" data-bs-target="#modalSearch">
                             <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#search"/></svg>
                             Search
-                        </RouterLink>
+                        </button>
                     </li>
                     <li class="nav-item">
-                        <RouterLink to="/link2" class="nav-link text-thin">
+                        <RouterLink to="profile" class="nav-link text-thin">
                             <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#user"/></svg>
                             Profile
                         </RouterLink>
                     </li>
-                    <div class="nav-item">
+                    <li class="nav-item">
                         <button type="button" class="nav-link btn text-thin border-0" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                             <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#upload"/></svg>
                             Upload Photo
                         </button>
-                    </div>
+                    </li>
                 </ul>
 
             </div>
@@ -40,21 +40,36 @@
         <router-view></router-view>
 
 
+<!-- Modal for search an user -->
+        <div class="modal fade" id="modalSearch" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalSearchLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5 text-thin" id="modalSearchLabel">Search User</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ModalSearch></ModalSearch>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5 text-thin" id="staticBackdropLabel">Upload Photo</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <ModalUpload></ModalUpload>
-      </div>
-    </div>
-  </div>
-</div>
+
+<!-- Modal for upload photos-->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5 text-thin" id="staticBackdropLabel">Upload Photo</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ModalUpload></ModalUpload>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>    
 </template>
 

@@ -12,7 +12,7 @@ func (db *appdbimpl) GetMyStream(userId uint64) ([]Photo, error) {
 
 	//Check if the user exists
 	if !db.UserExists(userId) {
-		return nil, UserSubjectNotExists
+		return nil, ErrUserSubjectNotExists
 	}
 
 	// ----------------------------------------------------------------------------------

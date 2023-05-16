@@ -13,7 +13,7 @@ func (db *appdbimpl) UnlikePhoto(userId uint64, photoId uint64) (uint64, error) 
 
 	// 1. Check if the user exists
 	if !db.UserExists(userId) {
-		return 0, UserSubjectNotExists
+		return 0, ErrUserSubjectNotExists
 	}
 	// 2. Check if the photo exists
 	var nLikes uint64

@@ -29,13 +29,13 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	nfollowers, err := rt.db.UnfollowUser(userId, followedId)
-	if errors.Is(err, database.UserSubjectNotExists) {
+	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		// The user (indicated by `id`) does not exist, reject the action indicating an error on the client side.
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("This user don't exists"))
 		return
 	}
-	if errors.Is(err, database.UserPredicateNotExists) {
+	if errors.Is(err, database.ErrUserPredicateNotExists) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("The user you are trying to unfollow does not exist "))
 		return

@@ -15,7 +15,7 @@ func (db *appdbimpl) SetMyUserName(userId uint64, username string) (string, erro
 	if err := db.c.QueryRow("SELECT username FROM Users where id = ?",
 		userId).Scan(&oldUsername); err != nil {
 		if err == sql.ErrNoRows {
-			return "", UserSubjectNotExists
+			return "", ErrUserSubjectNotExists
 		}
 	}
 

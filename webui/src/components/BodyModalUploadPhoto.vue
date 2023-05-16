@@ -1,18 +1,19 @@
 <template>
     <div class="mb-3">
-        <div class="d-flex">
-            <input type="file" ref="input" @change="previewImage" title="Choose file" class="form-control-file">
+        <div class="d-flex" v-if="!photoUploaded">
+            <input type="file">
             <button v-if="image" class="delete-button d-flex justify-content-end" @click="clearImage">
                 <i class="material-symbols-outlined">delete</i>
             </button>
         </div>
+        <SuccessMsg v-if="photoUploaded" class="mt-2" :msg="'The photo was uploaded correctly'" />
+        <ErrorMsg v-if="errorUploading" class="mt-2" msg="Error uploading the photo, please try again" />
         <img :src="image" v-if="image" class="mt-3 img-thumbnail">
         <div class="text-center">
             <button v-if="image" @click="uploadPhoto" class="btn btn-dark mt-3 mx-auto btn-lg w-100">
                 Upload
             </button>
         </div>
-        
     </div>
 </template>
 
@@ -21,17 +22,20 @@ export default {
     
     data() {
         return {
-            image: null
+            image: null,
+            file: null,
+            photoUploaded: false,
+            errorUploading: false
         }
     },
     methods: {
         previewImage(event) {
-            const file = event.target.files[0];
-            if (!file) {
+            this.file = event.target.files[0];
+            if (!this.file) {
                 return
             }
             const reader = new FileReader();
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(this.file);
             reader.onload = (event) => {
                 this.image = event.target.result;
             };
@@ -42,36 +46,48 @@ export default {
             this.$refs.input.value = ''
         },
 
-        async uploadPhoto(){
+        showSuccessMsg(){
+            this.photoUploaded = true
+            setTimeout(() => {
+                this.photoUploaded = false;
+            }, 2000); 
+        },
 
-            const formData = new FormData()
-            formData.append('userId', parseInt(localStorage.getItem('userId')))
-            formData.append('image', this.image)
-            console.log(formData)
-
-            
-
-            // for (const [key, value] of formData.entries()) {
-            //     console.log(key, value)
-            // }
-
-            const config = {
-                headers: {
-                    'content-type': 'multipart/form-data'
-                }
-            };
-
+        showErrorMsg(){
+            this.errorUploading = true
+            setTimeout(() => {
+                this.errorUploading = false;
+            }, 2000); 
+        },
         
+
+        async uploadPhoto(){
             try {
+                const formData = new FormData()
+                formData.append('userId', parseInt(localStorage.getItem('userId')))
+                formData.append('image', this.file)
+            
+                const config = {
+                    headers: {
+                        'Content-type': 'multipart/form-data'
+                    }
+                };
+
                 let response = await this.$axios.post("/photos", formData,config)
                 console.log(response.data)
+
+                //  Clear the input 
+                this.clearImage()
+                
+                // Show success message
+                this.showSuccessMsg()
             }   
             catch(error){
-                console.log(error)
+                //  Show error message
+                this.showErrorMsg()
             }
 
         }
-        
 
     }
 };

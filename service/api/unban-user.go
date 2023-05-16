@@ -29,7 +29,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	nbanned, err := rt.db.UnbanUser(userId, bannedId)
-	if errors.Is(err, database.UserSubjectNotExists) {
+	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		// The fountain (indicated by `id`) does not exist, reject the action indicating an error on the client side.
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("The user that starts the action does not exist"))
@@ -40,7 +40,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 		w.Write([]byte("You can't unban a user that is not banned"))
 		return
 	}
-	if errors.Is(err, database.UserPredicateNotExists) {
+	if errors.Is(err, database.ErrUserPredicateNotExists) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("The user that do you are trying to unban does not exist"))
 		return

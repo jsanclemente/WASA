@@ -7,9 +7,9 @@ func (db *appdbimpl) UploadPhoto(image []byte, id uint64) (uint64, error) {
 	// 2. Insertar en la tabla Posts que el usuario id postea la foto idPhoto
 	// 3. Incrementar el numero de posts de User en User + 1
 
-	//Ceck if the user exists
+	//Check if the user exists
 	if !db.UserExists(id) {
-		return 0, UserSubjectNotExists
+		return 0, ErrUserSubjectNotExists
 	}
 
 	var idPhoto uint64

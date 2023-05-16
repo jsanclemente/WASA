@@ -10,7 +10,7 @@
                 </h6>
                 <ul class="nav flex-column">
                     <li class="nav-item text-thin">
-                        <RouterLink to="home"  class="nav-link text-thin">
+                        <RouterLink :to="{ name: 'home'}"  class="nav-link text-thin">
                             <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
                             Home
                         </RouterLink>

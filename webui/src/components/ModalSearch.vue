@@ -8,9 +8,9 @@
             @input="searchUsers"
         />
         <ul class="list-group mt-2">
-            <li v-for="user in users" :key="user.ID" class="list-group-item text-thin bg-hover">
+            <button v-for="user in users" :key="user.ID" @click="() => handleClick(user.ID)" class="list-group-item text-thin bg-hover">
                 @{{ user.Username }}
-            </li>
+            </button>
         </ul>
 
         <error-msg v-if="!users" :msg="'No users found'" class="mt-2"></error-msg>
@@ -44,6 +44,10 @@ export default {
                 console.log(error)
             }
         },
+
+        handleClick(userId){
+            this.$router.push(`/myAccount/profile/${userId}`);
+        }
     }
 
 

@@ -1,6 +1,8 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 // The username associated to user "userId" changes to "username". Returns the old username.
 // If an error occurs, returns the empty string

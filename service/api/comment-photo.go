@@ -32,7 +32,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	nComments, err := rt.db.CommentPhoto(commentReq.UserId, photoId, commentReq.Comment)
+	idComment, err := rt.db.CommentPhoto(commentReq.UserId, photoId, commentReq.Comment)
 	// User doesn't exists
 	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
@@ -55,5 +55,5 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// Send the output to the user.
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(nComments)
+	_ = json.NewEncoder(w).Encode(idComment)
 }

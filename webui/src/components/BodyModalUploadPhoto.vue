@@ -18,14 +18,16 @@
 </template>
 
 <script>
+import LoadingSpinner from './LoadingSpinner.vue';
 export default {
+  components: { LoadingSpinner },
     
     data() {
         return {
             image: null,
             file: null,
             photoUploaded: false,
-            errorUploading: false
+            errorUploading: false,
         }
     },
     methods: {
@@ -78,12 +80,11 @@ export default {
 
                 //  Clear the input 
                 this.clearImage()
-                
+
                 // Show success message
                 this.showSuccessMsg()
             }   
             catch(error){
-                console.log(error)
                 //  Show error message
                 this.showErrorMsg()
             }

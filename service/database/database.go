@@ -56,6 +56,7 @@ type User struct {
 	Username   string
 	Followers  []int
 	Following  []int
+	Banners    []int
 	Posts      []int
 	Nfollowers uint64
 	Nfollowing uint64
@@ -139,7 +140,7 @@ type AppDatabase interface {
 
 	GetComments(photoId uint64) ([]Comment, error)
 
-	SearchUser(username string) ([]User, error)
+	SearchUser(username string, query string) ([]User, error)
 
 	// Ping checks whether the database is available or not (in that case, an error will be returned)
 	Ping() error

@@ -8,7 +8,7 @@
             @input="searchUsers"
         />
         <ul class="list-group mt-2">
-            <button v-for="user in users" :key="user.ID" @click="() => handleClick(user.ID)" class="list-group-item text-thin bg-hover">
+            <button v-for="user in users" :key="user.ID" @click="() => handleClick(user.ID)" data-bs-dismiss="modal" class="list-group-item text-thin bg-hover">
                 @{{ user.Username }}
             </button>
         </ul>
@@ -22,7 +22,7 @@ export default {
     data() {
         return {
             searchQuery: "",
-            users: []
+            users: [],
         };
     },
 
@@ -35,10 +35,13 @@ export default {
                 }
                 let response = await this.$axios.get("/users",{
                     params: {
-                        username: this.searchQuery
+                        username: localStorage.getItem("username"),
+                        query: this.searchQuery
                     }
                 })
+
                 this.users = response.data
+
             }
             catch(error) {
                 console.log(error)
@@ -46,7 +49,10 @@ export default {
         },
 
         handleClick(userId){
-            this.$router.push(`/myAccount/profile/${userId}`);
+            this.$emit('closeModal')
+            this.$router.push(`/myAccount/profile/${userId}`)
+            this.searchQuery = ""
+            this.users = []
         }
     }
 

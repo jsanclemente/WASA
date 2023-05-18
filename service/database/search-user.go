@@ -1,10 +1,10 @@
 package database
 
 // Function to search users that starts like the parameter "username"
-func (db *appdbimpl) SearchUser(username string) ([]User, error) {
+func (db *appdbimpl) SearchUser(username string, query string) ([]User, error) {
 
 	// Obtener las publicaciones del usuario
-	rows, err := db.c.Query("SELECT * FROM Users WHERE username LIKE ?", username+"%")
+	rows, err := db.c.Query("SELECT * FROM Users WHERE username LIKE ? AND username != ? ", query+"%", username)
 	if err != nil {
 		return nil, err
 	}

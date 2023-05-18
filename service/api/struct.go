@@ -10,6 +10,7 @@ type User struct {
 	Username   string `json:"userName"`
 	Followers  []int  `json:"followers"`
 	Following  []int  `json:"following"`
+	Banners    []int  `json:"banners"`
 	Posts      []int  `json:"posts"`
 	Nfollowers uint64 `json:"nFollowers"`
 	Nfollowing uint64 `json:"nFollowing"`
@@ -47,6 +48,7 @@ func (u *User) FromDatabase(user database.User) {
 	u.Username = user.Username
 	u.Followers = user.Followers
 	u.Following = user.Following
+	u.Banners = user.Banners
 	u.Posts = user.Posts
 	u.Nfollowers = user.Nfollowers
 	u.Nfollowing = user.Nfollowing
@@ -60,6 +62,7 @@ func (u *User) ToDatabase() database.User {
 		Username:   u.Username,
 		Followers:  u.Followers,
 		Following:  u.Following,
+		Banners:    u.Banners,
 		Posts:      u.Posts,
 		Nfollowers: u.Nfollowers,
 		Nfollowing: u.Nfollowing,

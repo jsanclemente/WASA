@@ -15,7 +15,7 @@
 											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 										</div>
 										<div class="modal-body">
-											<BodyModal :idPhoto="idPost"/>
+											<BodyModal :idPhoto="idPost" @delete-comment="deleteComment"/>
 										</div>
 									</div>
 								</div>
@@ -67,7 +67,7 @@
     },
     data() {
       return {
-        liked: false
+        liked: false,
       }
     },
     mounted() {
@@ -89,7 +89,11 @@
         else {
           this.likePost()
         }
-      }
+      },
+
+      deleteComment(commentId,photoId){
+        this.$emit('delete-comment', commentId, photoId)
+      },
   },
 
   }

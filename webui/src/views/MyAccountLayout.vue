@@ -16,7 +16,7 @@
                         </RouterLink>
                     </li>
                     <li class="nav-item">
-                        <button type="button" class="nav-link text-thin btn border-0" data-bs-toggle="modal" data-bs-target="#modalSearch">
+                        <button type="button" @click="handleOpenModal" class="nav-link text-thin btn border-0" data-bs-toggle="modal" data-bs-target="#modalSearch">
                             <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#search"/></svg>
                             Search
                         </button>
@@ -37,19 +37,19 @@
 
             </div>
 		</nav>
-        <router-view></router-view>
+        <router-view :key="$route.fullPath"></router-view>
 
 
 <!-- Modal for search an user -->
-        <div class="modal fade" id="modalSearch" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalSearchLabel" aria-hidden="true">
+        <div class="modal fade" id="modalSearch" :class="{ 'show': showModalSearch }" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalSearchLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5 text-thin" id="modalSearchLabel">Search User</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" @click="handleCloseModal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <ModalSearch></ModalSearch>
+                        <ModalSearch @closeModal="handleRedirect"></ModalSearch>
                     </div>
                 </div>
             </div>
@@ -77,9 +77,30 @@
 export default {
     data() {
         return {
-            id: parseInt(localStorage.getItem('userId'))
+            id: parseInt(localStorage.getItem('userId')),
+            showModalSearch: false
         };
-  },
+    },
+
+    methods: {
+        handleOpenModal(){
+            this.showModalSearch = true
+        },
+
+        handleCloseModal(){
+            this.showModalSearch = false
+        },
+
+        handleRedirect(){
+            this.showModalSearch = false
+            const modalElement = document.getElementById('modalSearch') 
+            if (modalElement) {
+                const bootstrapModal = new bootstrap.Modal(modalElement);
+                bootstrapModal.hide()
+            }
+        }
+
+    }
 }
 
 </script>

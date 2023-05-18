@@ -111,5 +111,6 @@ func (db *appdbimpl) GetMyStream(userId uint64) ([]Photo, error) {
 			posts = append(posts, post)
 		}
 	}
+
 	return posts, nil
 }

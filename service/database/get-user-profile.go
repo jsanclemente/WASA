@@ -68,5 +68,26 @@ func (db *appdbimpl) GetUserProfile(userId uint64) (User, error) {
 		}
 		user.Followers = append(user.Followers, followerID)
 	}
+
+	// ---------------------------------------------------------------------------------------
+
+	// Obtener una lista con los id's de usuario que tienen baneado a "userId"
+
+	rows, err = db.c.Query("SELECT banner_id FROM Bans WHERE banned_id = ?", userId)
+	if err != nil {
+		return User{}, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var bannerID int
+		err = rows.Scan(&bannerID)
+		if err != nil {
+			return User{}, err
+		}
+		user.Banners = append(user.Banners, bannerID)
+	}
+
+	// ---------------------------------------------------------------------------------------
 	return user, nil
 }

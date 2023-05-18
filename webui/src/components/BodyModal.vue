@@ -35,6 +35,7 @@ export default {
 					this.listEmpty = true
 				}
 			}
+			this.$emit('delete-comment', commentId, this.idPhoto)
 		},
 		// Add a comment to the post
 		async commentPhoto(){
@@ -45,9 +46,7 @@ export default {
 					userId: parseInt(localStorage.getItem('userId')),
 					comment: comment
 				})
-				console.log(response.data)
 				
-
 				// agrega el comentario a la lista
 				this.listComments.push({
 					IdComment: response.data,
@@ -57,7 +56,6 @@ export default {
 				this.listEmpty = false
 				// limpia el input
 				this.$refs.commentInput.value = "";
-				
 
 				
 			}
@@ -74,7 +72,6 @@ export default {
 			if (response.data !== null){
 				this.listComments = response.data
 			}
-			console.log(response.data)
 			if (response.data === null) {
 				this.listEmpty = true
 			}

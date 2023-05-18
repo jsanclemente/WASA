@@ -19,7 +19,20 @@
 								<p> following</p>
 							</div>
 						</div>
-						<div class="row justify-content-center mt-4" v-if="!sameUser">
+
+						<SuccessMsg :msg="'Username changed correctly'" v-if="this.usernameChanged"></SuccessMsg>
+						<error-msg :msg="this.messageError" v-if="this.error"></error-msg>
+
+						<div class="row justify-content-center mt-4" v-if="sameUser && !usernameChanged && !error">
+							<div class="col-auto">
+								<input type="text" class="form-control" v-model="newUsername" placeholder="Change your username">
+							</div>
+							<div class="col-auto">
+								<button @click="handleChangeUsername" class="btn btn-dark w-100">Confirm</button>
+							</div>
+      					</div>
+
+						<div class="row justify-content-center mt-4" v-if="!sameUser && !error">
 							<div class="col-auto">
 								<button v-if="!following" @click="handleFollow" :class="{ 'disabled': this.isDisabled }" class="btn btn-dark btn-lg w-100">Follow</button>
 								<button v-if="following" @click="handleFollow" class="btn btn-white btn-lg border-1 border-dark w-100">Unfollow</button>
@@ -46,7 +59,9 @@
 </template>
 
 <script>
+import ErrorMsg from '../components/ErrorMsg.vue';
 export default {
+  components: { ErrorMsg },
 
 	props: ['id'],
 
@@ -58,32 +73,132 @@ export default {
 			nFollowing: 0,
 			posts: [],
 			followers: [],
+			banners: [],
 			sameUser: false,
 			banned: false,
 			following: false,
-			isDisabled: false
+			isDisabled: false,
+			error: false,
+			messageError: "",
+			usernameChanged: false,
+			newUsername: ""
 		}
 	},
 
 	methods: {
-		handleFollow(){
-			this.following = !this.following
-			if(this.following === true){
-				this.nFollowers = this.nFollowers + 1
+		async handleFollow(){
+			if(this.following){
+				this.unfollowUser()
+
 			}
 			else {
-				this.nFollowers = this.nFollowers - 1
+				this.followUser()
 			}
-			console.log(this.following)
 		},
 
-		handleBan(){
+		async unfollowUser(){
+			try {
+				let response = await this.$axios.delete("users/" + parseInt(localStorage.getItem('userId')) +  "/following/" + this.id)
+				this.following = false
+				this.nFollowers = this.nFollowers - 1
+			}
+			catch(error){
+				console.log(error)
+			}
+		},
+		
+		async followUser(){
+			try {
+				let response = await this.$axios.put("users/" + parseInt(localStorage.getItem('userId')) +  "/following/" + this.id)
+				this.following = true
+				this.nFollowers = this.nFollowers + 1
+			}
+			catch(error){
+				this.messageError = error.response.data
+				this.showErrorMsg()
+			}
+		},
+
+		async handleBan(){
 			this.banned = !this.banned
 			this.isDisabled = this.banned ? true : false
-			if(this.banned == true && this.following == true){
+			if(this.banned && this.following){
 				this.following = false
+				this.nFollowers = this.nFollowers - 1
+				this.banUser()
 			}
-			console.log(this.banned)
+
+			if(this.banned == true && !this.following){
+				this.banUser()
+			}
+			else {
+				this.unbanUser()
+			}
+			
+		},
+
+		async banUser(){
+			try {
+				let response = await this.$axios.put("users/" + parseInt(localStorage.getItem('userId')) +  "/banned/" + this.id)
+				console.log(response.data)
+			}
+			catch(error){
+				console.log(error)
+			}
+		},
+
+		async unbanUser(){
+			try {
+				let response = await this.$axios.delete("users/" + parseInt(localStorage.getItem('userId')) +  "/banned/" + this.id)
+				console.log(response.data)
+			}
+			catch(error){
+				console.log(error)
+			}
+		},
+
+		showSuccessMsg(){
+            this.usernameChanged = true
+            setTimeout(() => {
+                this.usernameChanged = false;
+            }, 2000); 
+        },
+
+		showErrorMsg(){
+			this.error = true
+			setTimeout(() => {
+                this.error = false;
+            }, 2000); 
+		},
+
+		async handleChangeUsername(){
+
+			const isValidUsername = /^[a-zA-Z0-9_]{4,12}$/.test(this.newUsername)
+			if (!isValidUsername) {
+				this.messageError = "You have to type a valid username (numbers, letters and non-special characters and 4 to 12 characteres length)"
+				this.showErrorMsg()	
+				this.newUsername = ''
+				return
+			}
+
+			try {
+				const response = await this.$axios.put(`/users/${this.id}/name`, {
+					username: this.newUsername,
+				});
+				console.log(response.data)
+				this.username = this.newUsername
+				localStorage.setItem("username",this.username)
+				this.newUsername = ''
+
+				// Show succes msg
+				this.showSuccessMsg()
+
+			}
+			catch(error){
+				this.messageError = error.response.data
+				this.showErrorMsg()
+				this.newUsername = ''
+			}
 		},
 
 		setSameUser(){
@@ -96,6 +211,17 @@ export default {
 				return
 			}
 			this.following = this.followers.includes(id) ? true : false
+		},
+
+		setBan(){
+			const id = parseInt(localStorage.getItem("userId"))
+			if(this.banners === null){
+				return
+			}
+			this.banned = this.banners.includes(id) ? true : false
+			if (this.banned){
+				this.isDisabled = true
+			}
 		}
 	},
 
@@ -107,6 +233,7 @@ export default {
 			this.nFollowers = response.data.Nfollowers
 			this.nFollowing = response.data.Nfollowing
 			this.followers = response.data.Followers
+			this.banners = response.data.Banners
 			this.posts = response.data.Posts
 			// Set variable "sameUser"
 			this.setSameUser()
@@ -114,6 +241,8 @@ export default {
 			if(!this.sameUser){
 				// Set variable "following"
 				this.setFollowing()
+				// Set variable "banned"
+				this.setBan()
 			}
 
 			console.log(response.data)

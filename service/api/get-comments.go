@@ -26,7 +26,10 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	if errors.Is(err, database.ErrPhotoNotExits) {
 		// The user (indicated by `id`) does not exist, reject the action indicating an error on the client side.
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The photo doesn't exists"))
+		_, err := w.Write([]byte("The photo doesn't exists"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if err != nil {

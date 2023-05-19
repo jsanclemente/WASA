@@ -3,7 +3,7 @@ package database
 // "banner" bans user "banned". If everything is okey, returns the number of users banned for the user
 func (db *appdbimpl) BanUser(banner uint64, banned uint64) (uint64, error) {
 
-	//Check if banner and banned exists
+	//	Check if banner and banned exists
 	if !db.UserExists(banner) {
 		return 0, ErrUserSubjectNotExists
 	}
@@ -11,7 +11,7 @@ func (db *appdbimpl) BanUser(banner uint64, banned uint64) (uint64, error) {
 		return 0, ErrUserPredicateNotExists
 	}
 
-	//Chequear if "banned" is already banned by "banner"
+	//	Chequear if "banned" is already banned by "banner"
 	if db.IsBanned(banned, banner) {
 		return 0, ErrAlreadyBanned
 	}
@@ -36,13 +36,19 @@ func (db *appdbimpl) BanUser(banner uint64, banned uint64) (uint64, error) {
 		return 0, err
 	}
 
-	//Si banner seguia a banned, dejarlo de seguir.
+	//	Si banner seguia a banned, dejarlo de seguir.
 	if db.IsFollowing(banner, banned) {
-		db.UnfollowUser(banner, banned)
+		_, err := db.UnfollowUser(banner, banned)
+		if err != nil {
+			return 0, err
+		}
 	}
-	//Si banned seguia a banner, que banned deje de seguirlo
+	//	Si banned seguia a banner, que banned deje de seguirlo
 	if db.IsFollowing(banned, banner) {
-		db.UnfollowUser(banned, banner)
+		_, err := db.UnfollowUser(banned, banner)
+		if err != nil {
+			return 0, err
+		}
 	}
 
 	return nBans, nil

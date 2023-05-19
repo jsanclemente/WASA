@@ -31,17 +31,26 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	id, err := rt.db.DeletePhoto(userId, photoId)
 	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The user that deletes the photo does not exist"))
+		_, err := w.Write([]byte("The user that deletes the photo does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrNotHisPhoto) {
 		w.WriteHeader(http.StatusForbidden)
-		w.Write([]byte("You can't delete a photo you have not posted"))
+		_, err := w.Write([]byte("You can't delete a photo you have not posted"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrPhotoNotExits) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("This photo does not exist"))
+		_, err := w.Write([]byte("This photo does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if err != nil {

@@ -7,7 +7,7 @@ func (db *appdbimpl) UploadPhoto(image []byte, id uint64) (uint64, error) {
 	// 2. Insertar en la tabla Posts que el usuario id postea la foto idPhoto
 	// 3. Incrementar el numero de posts de User en User + 1
 
-	//Check if the user exists
+	// Check if the user exists
 	if !db.UserExists(id) {
 		return 0, ErrUserSubjectNotExists
 	}
@@ -25,7 +25,7 @@ func (db *appdbimpl) UploadPhoto(image []byte, id uint64) (uint64, error) {
 	}
 	idPhoto = uint64(lastInsertID)
 
-	res, err = db.c.Exec(`INSERT INTO Posts (user_id,photo_id,date) VALUES (?, ?, datetime('now','localtime'))`,
+	_, err = db.c.Exec(`INSERT INTO Posts (user_id,photo_id,date) VALUES (?, ?, datetime('now','localtime'))`,
 		id, idPhoto)
 	if err != nil {
 		return 0, err

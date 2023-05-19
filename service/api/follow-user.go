@@ -28,32 +28,46 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	//Creo que el error esta en esta funcion
 	nfollowers, err := rt.db.FollowUser(userId, followedId)
 	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		// The user (indicated by `id`) does not exist, reject the action indicating an error on the client side.
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The user that do the follow action don't exists"))
+		_, err := w.Write([]byte("The user that do the follow action don't exists"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrUser1alreadyFollows2) {
 		w.WriteHeader(http.StatusConflict)
-		w.Write([]byte("You are already following this user"))
+		_, err := w.Write([]byte("You are already following this user"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrUserAIsBanned) {
 		w.WriteHeader(http.StatusForbidden)
-		w.Write([]byte("You can't follow this user. The user you are trying to follow has banned you"))
+		_, err := w.Write([]byte("You can't follow this user. The user you are trying to follow has banned you"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrUserBIsBanned) {
 		w.WriteHeader(http.StatusForbidden)
-		w.Write([]byte("You can't follow a user you have already banned"))
+		_, err := w.Write([]byte("You can't follow a user you have already banned"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrUserPredicateNotExists) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The user you are trying to follow doesn't exists"))
+		_, err := w.Write([]byte("The user you are trying to follow doesn't exists"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if err != nil {

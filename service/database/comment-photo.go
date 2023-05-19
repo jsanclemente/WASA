@@ -33,8 +33,8 @@ func (db *appdbimpl) CommentPhoto(userId uint64, photoId uint64, comment string)
 	if err != nil {
 		return 0, err
 	}
-	var idComment uint64
-	idComment = uint64(lastInsertID)
+
+	var idComment = uint64(lastInsertID)
 
 	var nComments uint64
 	if err := db.c.QueryRow("SELECT nComments FROM Photos where id = ?",

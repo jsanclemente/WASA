@@ -30,13 +30,19 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	// Comment doesn't exists
 	if errors.Is(err, database.ErrCommentNotExists) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The comment that you are trying to remove does not exist"))
+		_, err := w.Write([]byte("The comment that you are trying to remove does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	// Photo doesn't exists
 	if errors.Is(err, database.ErrPhotoNotExits) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("This photo does not exist"))
+		_, err := w.Write([]byte("This photo does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if err != nil {

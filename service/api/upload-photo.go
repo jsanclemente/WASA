@@ -5,7 +5,7 @@ import (
 	"WASA/service/database"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -30,7 +30,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	defer image.Close()
 
 	// Leer el archivo en memoria
-	imageBytes, err := ioutil.ReadAll(image)
+	imageBytes, err := io.ReadAll(image)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -39,7 +39,10 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	idPhoto, err := rt.db.UploadPhoto(imageBytes, userId)
 	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The user that uploads the photo does not exist"))
+		_, err := w.Write([]byte("The user that uploads the photo does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if err != nil {

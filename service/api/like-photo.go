@@ -29,17 +29,26 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	nlikes, err := rt.db.LikePhoto(userId, photoId)
 	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The user that starts the action does not exist"))
+		_, err := w.Write([]byte("The user that starts the action does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrPhotoAlreadyLiked) {
 		w.WriteHeader(http.StatusForbidden)
-		w.Write([]byte("You can't like a photo twice"))
+		_, err := w.Write([]byte("You can't like a photo twice"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrPhotoNotExits) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("You can't like a photo that does not exist"))
+		_, err := w.Write([]byte("You can't like a photo that does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	} else if err != nil {
 		ctx.Logger.WithError(err).WithField("photoId", photoId).Error("can't like the photo")

@@ -33,12 +33,18 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 	oldUsername, err := rt.db.SetMyUserName(userId, request.Username)
 	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The user that starts the action does not exist"))
+		_, err := w.Write([]byte("The user that starts the action does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrUsernameAlreadyRegistered) {
 		w.WriteHeader(http.StatusForbidden)
-		w.Write([]byte("This username is already used by another user"))
+		_, err := w.Write([]byte("This username is already used by another user"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if err != nil {

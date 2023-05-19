@@ -34,6 +34,9 @@ func (db *appdbimpl) GetUserProfile(userId uint64) (User, error) {
 		}
 		user.Posts = append(user.Posts, postID)
 	}
+	if err := rows.Err(); err != nil {
+		return User{}, err
+	}
 	// ----------------------------------------------------------------------------
 
 	// Obtener la lista con los id's de los usuarios a los que sigo
@@ -51,6 +54,9 @@ func (db *appdbimpl) GetUserProfile(userId uint64) (User, error) {
 		}
 		user.Following = append(user.Following, followingID)
 	}
+	if err := rows.Err(); err != nil {
+		return User{}, err
+	}
 	// ---------------------------------------------------------------------------------------
 
 	// Obtener una lista de los usuarios que me siguen
@@ -67,6 +73,9 @@ func (db *appdbimpl) GetUserProfile(userId uint64) (User, error) {
 			return User{}, err
 		}
 		user.Followers = append(user.Followers, followerID)
+	}
+	if err := rows.Err(); err != nil {
+		return User{}, err
 	}
 
 	// ---------------------------------------------------------------------------------------
@@ -86,6 +95,9 @@ func (db *appdbimpl) GetUserProfile(userId uint64) (User, error) {
 			return User{}, err
 		}
 		user.Banners = append(user.Banners, bannerID)
+	}
+	if err := rows.Err(); err != nil {
+		return User{}, err
 	}
 
 	// ---------------------------------------------------------------------------------------

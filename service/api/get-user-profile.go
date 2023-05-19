@@ -24,7 +24,10 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	user, err = rt.db.GetUserProfile(userId)
 	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("This user does not exist"))
+		_, err := w.Write([]byte("This user does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 

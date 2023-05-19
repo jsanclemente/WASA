@@ -26,7 +26,7 @@ func (db *appdbimpl) SearchUser(username string, query string) ([]User, error) {
 		users = append(users, user)
 	}
 
-	// Check if there were errors during rows.Next
+	// Check if there were errors during rows.Next()
 	err = rows.Err()
 	if err != nil {
 		return nil, err

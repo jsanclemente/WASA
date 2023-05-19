@@ -32,17 +32,26 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		// The user (indicated by `id`) does not exist, reject the action indicating an error on the client side.
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("This user don't exists"))
+		_, err := w.Write([]byte("This user don't exists"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrUserPredicateNotExists) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The user you are trying to unfollow does not exist "))
+		_, err := w.Write([]byte("The user you are trying to unfollow does not exist "))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrNotFollowing) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("You can't unfollow a user that you are not following"))
+		_, err := w.Write([]byte("You can't unfollow a user that you are not following"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if err != nil {

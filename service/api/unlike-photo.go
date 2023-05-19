@@ -29,17 +29,26 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	nlikes, err := rt.db.UnlikePhoto(userId, photoId)
 	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The user that unlikes the photo does not exist"))
+		_, err := w.Write([]byte("The user that unlikes the photo does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrNotHisLike) {
 		w.WriteHeader(http.StatusForbidden)
-		w.Write([]byte("You can't remove a like that is not yours"))
+		_, err := w.Write([]byte("You can't remove a like that is not yours"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrPhotoNotExits) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("You can remove the like of a photo that does not exist"))
+		_, err := w.Write([]byte("You can remove the like of a photo that does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	} else if err != nil {
 		ctx.Logger.WithError(err).WithField("photoId", photoId).Error("can't unlike the photo")

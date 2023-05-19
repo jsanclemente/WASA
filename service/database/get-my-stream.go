@@ -10,7 +10,7 @@ func (db *appdbimpl) GetMyStream(userId uint64) ([]Photo, error) {
 	// Por cada usuario que sigue userId, mirar en la tabla posts que fotos tiene subidas y despues mirar en la tabla fotos para sacar los likes y comments
 	// obtener los usuarios a los que sigue el idUser
 
-	//Check if the user exists
+	// Check if the user exists
 	if !db.UserExists(userId) {
 		return nil, ErrUserSubjectNotExists
 	}
@@ -24,7 +24,7 @@ func (db *appdbimpl) GetMyStream(userId uint64) ([]Photo, error) {
 	}
 	defer func() { _ = rows.Close() }()
 
-	//Se almacenan todos los usuarios a los que sigue el "userId" en una lista de id's
+	// Se almacenan todos los usuarios a los que sigue el "userId" en una lista de id's
 	var followedUsers []int
 	for rows.Next() {
 		var followedUser int
@@ -34,8 +34,8 @@ func (db *appdbimpl) GetMyStream(userId uint64) ([]Photo, error) {
 		followedUsers = append(followedUsers, followedUser)
 	}
 
-	if rr := rows.Err(); rr != nil {
-		return nil, nil
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	//	---------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ func (db *appdbimpl) GetMyStream(userId uint64) ([]Photo, error) {
 			if err != nil {
 				return nil, err
 			}
-			post.Date = datetype.Format("02-01-2006") //Sacar fecha
-			post.Time = datetype.Format("15:04:05")   //Sacar la hora
+			post.Date = datetype.Format("02-01-2006") // Sacar fecha
+			post.Time = datetype.Format("15:04:05")   // Sacar la hora
 			if err != nil {
 				return nil, err
 			}
@@ -92,6 +92,9 @@ func (db *appdbimpl) GetMyStream(userId uint64) ([]Photo, error) {
 				}
 				post.Likes = append(post.Likes, user)
 			}
+			if err := rows.Err(); err != nil {
+				return nil, err
+			}
 
 			// Se obtienen los id's de los comentarios para cada publicación
 			rows, err = db.c.Query("SELECT comment_id FROM Comments WHERE photo_id=?", post.ID)
@@ -107,8 +110,14 @@ func (db *appdbimpl) GetMyStream(userId uint64) ([]Photo, error) {
 				}
 				post.Comments = append(post.Comments, commentId)
 			}
+			if err := rows.Err(); err != nil {
+				return nil, err
+			}
 			// -----------------------------------------------------------------------------------
 			posts = append(posts, post)
+		}
+		if err := rows.Err(); err != nil {
+			return nil, err
 		}
 	}
 

@@ -4,11 +4,11 @@ package database
 // otherwise, returns 0.
 func (db *appdbimpl) UnfollowUser(unfollower uint64, unfollowed uint64) (uint64, error) {
 
-	//Check if unfollower exists
+	// Check if unfollower exists
 	if !db.UserExists(unfollower) {
 		return 0, ErrUserSubjectNotExists
 	}
-	//Check if unfollowed exists
+	// Check if unfollowed exists
 	if !db.UserExists(unfollowed) {
 		return 0, ErrUserPredicateNotExists
 	}

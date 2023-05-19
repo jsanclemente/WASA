@@ -91,9 +91,6 @@
         }
       },
 
-      deleteComment(commentId,photoId){
-        this.$emit('delete-comment', commentId, photoId)
-      },
   },
 
   }

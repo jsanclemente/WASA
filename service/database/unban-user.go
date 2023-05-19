@@ -7,7 +7,7 @@ func (db *appdbimpl) UnbanUser(unbanner uint64, unbanned uint64) (uint64, error)
 	if !db.UserExists(unbanner) {
 		return 0, ErrUserSubjectNotExists
 	}
-	//Check if unbanned exists
+	// Check if unbanned exists
 	if !db.UserExists(unbanned) {
 		return 0, ErrUserPredicateNotExists
 	}

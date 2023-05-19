@@ -56,9 +56,6 @@ import LoadingSpinner from '../components/LoadingSpinner.vue';
 					console.log(error)
 				}
 			},
-
-			deleteComment(commentId,photoId){
-			}
 			
 }}
 	
@@ -91,7 +88,7 @@ import LoadingSpinner from '../components/LoadingSpinner.vue';
 						</Post>		
 					</div>
 				</div>  
-				<div v-if="streamEmpty">
+				<div v-if="this.streamEmpty">
 					<h1 class="text-white">To see your feed you have to follow users or wait them to post any photo!</h1>
 				</div>
 			</div>

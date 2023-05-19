@@ -36,13 +36,19 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	// User doesn't exists
 	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The user that comments the photo does not exist"))
+		_, err := w.Write([]byte("The user that comments the photo does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	// Photo doesn't exists
 	if errors.Is(err, database.ErrPhotoNotExits) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("You can't comment a photo that does not exist"))
+		_, err := w.Write([]byte("You can't comment a photo that does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if err != nil {

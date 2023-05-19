@@ -10,9 +10,9 @@ import (
 )
 
 func (rt *_router) searchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
 	username := r.URL.Query().Get("username")
 	query := r.URL.Query().Get("query")
+
 	// If username is empty, the request is wrong
 	if username == "" {
 		w.WriteHeader(http.StatusBadRequest)

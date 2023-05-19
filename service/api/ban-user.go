@@ -32,17 +32,26 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	if errors.Is(err, database.ErrUserSubjectNotExists) {
 		// The fountain (indicated by `id`) does not exist, reject the action indicating an error on the client side.
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The user that do the ban does not exist"))
+		_, err := w.Write([]byte("The user that do the ban does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrAlreadyBanned) {
 		w.WriteHeader(http.StatusForbidden)
-		w.Write([]byte("The user that you are trying to ban is already bananed"))
+		_, err := w.Write([]byte("The user that you are trying to ban is already bananed"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if errors.Is(err, database.ErrUserPredicateNotExists) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("The user that you are trying to ban does not exist"))
+		_, err := w.Write([]byte("The user that you are trying to ban does not exist"))
+		if err != nil {
+			return
+		}
 		return
 	}
 	if err != nil {

@@ -33,6 +33,12 @@
                             Upload Photo
                         </button>
                     </li>
+                    <li class="nav-item">
+                        <RouterLink :to="{ name: 'login'}" class="nav-link text-thin" @click="localStorage.removeItem('userId')">
+                            <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
+                            Logout
+                        </RouterLink>
+                    </li>
                 </ul>
 
             </div>
@@ -49,7 +55,7 @@
                         <button type="button" @click="handleCloseModal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <ModalSearch @closeModal="handleRedirect"></ModalSearch>
+                        <ModalSearch @closeModal="handleCloseModal"></ModalSearch>
                     </div>
                 </div>
             </div>
@@ -90,15 +96,6 @@ export default {
         handleCloseModal(){
             this.showModalSearch = false
         },
-
-        handleRedirect(){
-            this.showModalSearch = false
-            const modalElement = document.getElementById('modalSearch') 
-            if (modalElement) {
-                const bootstrapModal = new bootstrap.Modal(modalElement);
-                bootstrapModal.hide()
-            }
-        }
 
     }
 }

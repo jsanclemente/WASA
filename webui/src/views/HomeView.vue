@@ -70,7 +70,7 @@ import LoadingSpinner from '../components/LoadingSpinner.vue';
 				<div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 					<div v-if="!streamEmpty" class="main">
 						<loading-spinner :loading="this.loading"></loading-spinner>
-						<Post v-for="item in posts" @delete-comment="deleteComment" @like="handleLike" @unlike="handleUnlike" :key="item.ID" :idPost="item.ID" :username="item.Username" :nlikes="item.Nlikes" :comments="item.Ncomments" :date="item.Date" :time="item.Time" :image="item.Image" :likes="item.Likes">
+						<Post v-for="item in posts" @like="handleLike" @unlike="handleUnlike" :key="item.ID" :idPost="item.ID" :username="item.Username" :nlikes="item.Nlikes" :comments="item.Ncomments" :date="item.Date" :time="item.Time" :image="item.Image" :likes="item.Likes">
 							<!-- Modal -->
 							<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 								<div class="modal-dialog modal-dialog-centered">

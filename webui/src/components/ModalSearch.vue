@@ -36,7 +36,8 @@ export default {
                 let response = await this.$axios.get("/users",{
                     params: {
                         username: localStorage.getItem("username"),
-                        query: this.searchQuery
+                        query: this.searchQuery,
+                        id: parseInt(localStorage.getItem('userId'))
                     }
                 })
 

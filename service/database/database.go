@@ -36,20 +36,20 @@ import (
 	"fmt"
 )
 
-var ErrUserSubjectNotExists = errors.New("The user that starts the action doesn't exist")
-var ErrUserPredicateNotExists = errors.New("The user that recieves the action doesn`t exists")
-var ErrPhotoNotExits = errors.New("The photo doesn't exists")
-var ErrCommentNotExists = errors.New("The comment doesn't exist")
-var ErrUser1alreadyFollows2 = errors.New("The user A is already following user B")
-var ErrNotFollowing = errors.New("The user A doesn't follow user B")
-var ErrUserAIsBanned = errors.New("The user A is banned by B")
-var ErrUserBIsBanned = errors.New("The user B is banned by A")
-var ErrAlreadyBanned = errors.New("The user is already banned")
-var ErrNotBanned = errors.New("The user you are trying to unban it's not banned")
-var ErrNotHisPhoto = errors.New("The user is trying to delete a post he hasn't posted")
-var ErrNotHisLike = errors.New("The user is trying to remove the like of a post he hasn't liked")
-var ErrUsernameAlreadyRegistered = errors.New("This username is already used")
-var ErrPhotoAlreadyLiked = errors.New("You can't like a photo twice")
+var ErrUserSubjectNotExists = errors.New("the user that starts the action doesn't exist")
+var ErrUserPredicateNotExists = errors.New("the user that recieves the action doesn`t exists")
+var ErrPhotoNotExits = errors.New("the photo doesn't exists")
+var ErrCommentNotExists = errors.New("the comment doesn't exist")
+var ErrUser1alreadyFollows2 = errors.New("the user A is already following user B")
+var ErrNotFollowing = errors.New("the user A doesn't follow user B")
+var ErrUserAIsBanned = errors.New("the user A is banned by B")
+var ErrUserBIsBanned = errors.New("the user B is banned by A")
+var ErrAlreadyBanned = errors.New("the user is already banned")
+var ErrNotBanned = errors.New("the user you are trying to unban it's not banned")
+var ErrNotHisPhoto = errors.New("the user is trying to delete a post he hasn't posted")
+var ErrNotHisLike = errors.New("the user is trying to remove the like of a post he hasn't liked")
+var ErrUsernameAlreadyRegistered = errors.New("this username is already used")
+var ErrPhotoAlreadyLiked = errors.New("you can't like a photo twice")
 
 type User struct {
 	ID         uint64
@@ -140,7 +140,7 @@ type AppDatabase interface {
 
 	GetComments(photoId uint64) ([]Comment, error)
 
-	SearchUser(username string, query string) ([]User, error)
+	SearchUser(username string, query string, id uint64) ([]User, error)
 
 	// Ping checks whether the database is available or not (in that case, an error will be returned)
 	Ping() error

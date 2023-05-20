@@ -15,7 +15,7 @@
 											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 										</div>
 										<div class="modal-body">
-											<BodyModal :idPhoto="idPost" @delete-comment="deleteComment"/>
+											<BodyModal :idPhoto="idPost"/>
 										</div>
 									</div>
 								</div>

@@ -5,6 +5,7 @@ import (
 	"WASA/service/database"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -12,6 +13,14 @@ import (
 func (rt *_router) searchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	username := r.URL.Query().Get("username")
 	query := r.URL.Query().Get("query")
+	idString := r.URL.Query().Get("id")
+
+	id, err := strconv.ParseUint(idString, 10, 64)
+	if err != nil {
+		// Manejar el error de conversión
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	// If username is empty, the request is wrong
 	if username == "" {
@@ -24,7 +33,7 @@ func (rt *_router) searchUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	var users []database.User
-	users, err := rt.db.SearchUser(username, query)
+	users, err = rt.db.SearchUser(username, query, id)
 	if err != nil {
 		// In this case, we have an error on our side. Log the error (so we can be notified) and send a 500 to the user
 		// Note: we are using the "logger" inside the "ctx" (context) because the scope of this issue is the request.

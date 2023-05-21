@@ -26,13 +26,13 @@ import LoadingSpinner from '../components/LoadingSpinner.vue';
 				const array = response.data
 				console.log(array)
 				this.posts = array.slice().reverse()
-				
+				this.loading = false
 				
 				for (let i = 0; i < this.posts.length; i++) {
 					this.posts[i].Image = 'data:image/jpeg;base64,'+this.posts[i].Image
 					// console.log(imageUrl)					
 				}
-				this.loading = false
+				
 			}
 			catch (error){
 				console.log(error)

@@ -31,7 +31,7 @@ export default {
             try {
                 if (this.searchQuery.length === 0) {
                     this.users = []; // 
-                    return; // Evitar realizar la petición
+                    return // No hacer la petición
                 }
                 let response = await this.$axios.get("/users",{
                     params: {

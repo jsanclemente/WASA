@@ -34,7 +34,7 @@
                         </button>
                     </li>
                     <li class="nav-item">
-                        <RouterLink :to="{ name: 'login'}" class="nav-link text-thin" @click="localStorage.removeItem('userId')">
+                        <RouterLink :to="{ name: 'login'}" class="nav-link text-thin">
                             <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
                             Logout
                         </RouterLink>

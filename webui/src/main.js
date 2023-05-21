@@ -20,6 +20,8 @@ import ModalSearch from './components/ModalSearch.vue'
 import './assets/dashboard.css'
 import './assets/main.css'
 
+
+
 library.add(fas)
 
 const app = createApp(App)

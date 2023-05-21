@@ -142,6 +142,12 @@ type AppDatabase interface {
 
 	SearchUser(username string, query string, id uint64) ([]User, error)
 
+	GetPhoto(photoId uint64) (Photo, error)
+
+	GetFollowers(userId uint64) ([]User, error)
+
+	GetFollowing(userId uint64) ([]User, error)
+
 	// Ping checks whether the database is available or not (in that case, an error will be returned)
 	Ping() error
 }

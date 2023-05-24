@@ -42,9 +42,14 @@ export default {
 			try {
 
 				const comment = this.$refs.commentInput.value
+				const token = localStorage.getItem('token')
 				let response = await this.$axios.post("/photos/" + this.idPhoto + "/comments", {
 					userId: parseInt(localStorage.getItem('userId')),
 					comment: comment
+				}, {
+					headers: {
+						Authorization: token
+					}
 				})
 				
 				// agrega el comentario a la lista
@@ -67,8 +72,13 @@ export default {
 
 	async created(){
 		try {
-			const id = parseInt(localStorage.getItem('userId'));
-			let response = await this.$axios.get("/photos/" + this.idPhoto + "/comments")
+			const id = parseInt(localStorage.getItem('userId'))
+			const token = localStorage.getItem('token')
+			let response = await this.$axios.get("/photos/" + this.idPhoto + "/comments", {
+				headers: {
+					Authorization: token
+				}
+			})
 			if (response.data !== null){
 				this.listComments = response.data
 			}

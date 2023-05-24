@@ -46,7 +46,7 @@
 											@{{ user.Username }}
 										</li>
 									</ul>
-									<h1 class="text-thin" v-if="!followersList">You don't have any follower</h1>
+									<h1 class="text-thin" v-if="!followersList">You don't have any followers</h1>
 								</div>
 								</div>
 							</div>
@@ -86,14 +86,14 @@
 						  </div>
 						  <h3 class="text-thin text-center mt-4">Publicaciones</h3>
 						  <div class="row text-center w-75">
-						  	<div class="col-4" v-for="(image, id) in this.images" :key="id">
+							<div class="col-4" v-for="(image, id) in Object.entries(this.images).reverse()" :key="image[0]">
 								  <div class="card mt-2 mb-2 ml-2 mr-2">
 										<div class="card-image-container">
-											<img :src="image" class="card-img-top h-100 border rounded">
+											<img :src="image[1]" class="card-img-top h-100 border rounded">
 										</div>
 
 			
-										<div class="dropdown position-absolute top-0 end-0">
+										<div class="dropdown position-absolute top-0 end-0" v-if="sameUser">
 											<button class="btn btn-white border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
 												<i class="material-symbols-outlined">more_horiz</i>
 											</button>
@@ -155,9 +155,14 @@
   
 		  async unfollowUser(){
 			  try {
-				  let response = await this.$axios.delete("users/" + parseInt(localStorage.getItem('userId')) +  "/following/" + this.id)
-				  this.following = false
-				  this.nFollowers = this.nFollowers - 1
+					const token = localStorage.getItem('token')
+					let response = await this.$axios.delete("users/" + parseInt(localStorage.getItem('userId')) +  "/following/" + this.id, {
+						headers: {
+							Authorization: token 
+						}
+					})
+					this.following = false
+					this.nFollowers = this.nFollowers - 1
 			  }
 			  catch(error){
 				  console.log(error)
@@ -166,9 +171,17 @@
 		  
 		  async followUser(){
 			  try {
-				  let response = await this.$axios.put("users/" + parseInt(localStorage.getItem('userId')) +  "/following/" + this.id)
-				  this.following = true
-				  this.nFollowers = this.nFollowers + 1
+					const token = localStorage.getItem('token')
+					let response = await this.$axios.put("users/" + parseInt(localStorage.getItem('userId')) +  "/following/" + this.id,
+					{},
+					{
+						headers: {
+							Authorization: token
+						}
+					}
+					);
+					this.following = true
+					this.nFollowers = this.nFollowers + 1
 			  }
 			  catch(error){
 				  this.messageError = error.response.data
@@ -178,8 +191,13 @@
 
 		  async fetchFollowers(){
 			try{
-				let response = await this.$axios.get("users/" + parseInt(localStorage.getItem('userId')) + "/followers")
-				console.log(response.data)
+				const token = localStorage.getItem('token')
+				const id_user = this.sameUser ? parseInt(localStorage.getItem('userId')): this.id
+				let response = await this.$axios.get("users/" + id_user + "/followers", { 
+					headers: {
+						Authorization: token
+					}
+				})
 				this.followersList = response.data
 			}
 			catch(error){
@@ -189,8 +207,13 @@
 
 		  async fetchFollowing(){
 				try{
-					let response = await this.$axios.get("users/" + parseInt(localStorage.getItem('userId')) + "/following")
-					console.log(response.data)
+					const token = localStorage.getItem('token')
+					const id_user = this.sameUser ? parseInt(localStorage.getItem('userId')): this.id
+					let response = await this.$axios.get("users/" + id_user + "/following", {
+						headers: {
+							Authorization: token
+						}
+					})
 					this.followingList = response.data
 				}
 				catch(error){
@@ -219,8 +242,15 @@
   
 		  async banUser(){
 			  try {
-				  let response = await this.$axios.put("users/" + parseInt(localStorage.getItem('userId')) +  "/banned/" + this.id)
-				  console.log(response.data)
+				  const token = localStorage.getItem('token')
+				  let response = await this.$axios.put("users/" + parseInt(localStorage.getItem('userId')) +  "/banned/" + this.id,
+				  	{},
+					{
+						headers: {
+							Authorization: token
+						}
+					})
+				  
 			  }
 			  catch(error){
 				  console.log(error)
@@ -229,8 +259,12 @@
   
 		  async unbanUser(){
 			  try {
-				  let response = await this.$axios.delete("users/" + parseInt(localStorage.getItem('userId')) +  "/banned/" + this.id)
-				  console.log(response.data)
+				  const token = localStorage.getItem('token')
+				  let response = await this.$axios.delete("users/" + parseInt(localStorage.getItem('userId')) +  "/banned/" + this.id, {
+					headers: {
+						Authorization: token
+					}
+				  })
 			  }
 			  catch(error){
 				  console.log(error)
@@ -262,10 +296,14 @@
 			  }
   
 			  try {
+				  const token = localStorage.getItem('token')
 				  const response = await this.$axios.put(`/users/${this.id}/name`, {
 					  username: this.newUsername,
+				  }, {
+						headers: {
+							Authorization: token 
+						}
 				  });
-				  console.log(response.data)
 				  this.username = this.newUsername
 				  localStorage.setItem("username",this.username)
 				  this.newUsername = ''
@@ -307,7 +345,13 @@
 		  async deletePhoto(photoId) {
 				if (this.sameUser == true){
 					try {
-						let response = await this.$axios.delete("/photos/" + photoId + "?userId=" + this.id)
+						const token = localStorage.getItem('token')
+						console.log(photoId)
+						let response = await this.$axios.delete("/photos/" + photoId + "?userId=" + this.id, {
+							headers: {
+								Authorization: token
+							}
+						})
 						delete this.images[photoId]
 
 						const index = this.posts.indexOf(parseInt(photoId));
@@ -326,7 +370,12 @@
   
 	  async created(){
 		  try {
-			  let response = await this.$axios.get("/users/"+ this.id + "/profile")
+			  const token = localStorage.getItem('token')
+			  let response = await this.$axios.get("/users/"+ this.id + "/profile", {
+				headers: {
+					Authorization: token
+				}
+			  })
 			  this.username = response.data.Username
 			  this.nPosts = response.data.Nposts
 			  this.nFollowers = response.data.Nfollowers
@@ -334,16 +383,22 @@
 			  this.followers = response.data.Followers
 			  this.banners = response.data.Banners
 			  this.posts = response.data.Posts
+			  console.log(this.posts)
+
+
 
 			  if (this.posts !== null){
 				for (let i = 0; i < this.posts.length; i++) {
-				  let image = await this.$axios.get("/photos/"+ this.posts[i] + "/image")
+				  let image = await this.$axios.get("/photos/"+ this.posts[i] + "/image", {
+					headers: {
+						Authorization: token
+					}
+				  })
 				  this.images[image.data.ID] = "data:image/jpeg;base64,"+image.data.Image
-			  }
+			  	}
 			  }
   
-			  
-  
+		  
 			  // Set variable "sameUser"
 			  this.setSameUser()
   

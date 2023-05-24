@@ -34,7 +34,12 @@ export default {
 
         async handleClick(){
             try {
-                let response = await this.$axios.delete("/photos/" + this.idPhoto + "/comments/" + this.id)
+                const token = localStorage.getItem('token')
+                let response = await this.$axios.delete("/photos/" + this.idPhoto + "/comments/" + this.id, {
+                    headers: {
+                        Authorization: token
+                    }
+                })
                 this.$emit('delete-comment',this.id)
             } 
             catch(error){

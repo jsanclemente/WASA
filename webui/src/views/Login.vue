@@ -50,8 +50,9 @@ export default {
 				let response = await this.$axios.post("/users", {
 					username: this.username,
 				});
-				this.id = response.data
+				this.id = response.data.userId
 				localStorage.setItem('userId', String(this.id))
+				localStorage.setItem('token',response.data.token)
 				localStorage.setItem('username', this.username)
 				router.push('/myAccount/home')
 			} catch (error) {

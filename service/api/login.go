@@ -4,12 +4,20 @@ import (
 	"WASA/service/api/reqcontext"
 	"encoding/json"
 	"net/http"
+	"strconv"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 )
 
 type LoginRequest struct {
 	Username string `json:"username"`
+}
+
+type LoginResponse struct {
+	Token  string `json:"token"`
+	UserId uint64 `json:"userId"`
 }
 
 func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -31,7 +39,43 @@ func (rt *_router) login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
+	// Generar el token JWT con el userId
+
+	token, err := generateToken(strconv.FormatUint(id, 10))
+	if err != nil {
+		// Manejo del error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Crear la respuesta con el token y el userId
+	response := LoginResponse{
+		Token:  token,
+		UserId: id,
+	}
+
 	// Send the output to the user.
 	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(id)
+	_ = json.NewEncoder(w).Encode(response)
+}
+
+// Función para generar un token JWT firmado con el userId
+func generateToken(userId string) (string, error) {
+	// Crear un nuevo token JWT
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	// Configurar las reclamaciones (claims) del token
+	claims := token.Claims.(jwt.MapClaims)
+	claims["userId"] = userId
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix() // Configurar la fecha de expiración del token
+
+	// Firmar el token con una clave secreta
+	secretKey := "9K7Ufvg$YmqP4e^u"
+
+	tokenString, err := token.SignedString([]byte(secretKey))
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }

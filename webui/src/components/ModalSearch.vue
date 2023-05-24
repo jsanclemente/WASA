@@ -33,13 +33,17 @@ export default {
                     this.users = []; // 
                     return // No hacer la petición
                 }
-                let response = await this.$axios.get("/users",{
+				const token = localStorage.getItem('token')
+                let response = await this.$axios.get("/users", {
                     params: {
                         username: localStorage.getItem("username"),
                         query: this.searchQuery,
                         id: parseInt(localStorage.getItem('userId'))
+                    },
+                    headers: {
+                        Authorization: token
                     }
-                })
+                });
 
                 this.users = response.data
 

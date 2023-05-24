@@ -68,10 +68,13 @@ export default {
                 const formData = new FormData()
                 formData.append('userId', parseInt(localStorage.getItem('userId')))
                 formData.append('image', this.file)
+
+                const token = localStorage.getItem('token')
             
                 const config = {
                     headers: {
-                        'Content-type': 'multipart/form-data'
+                        'Content-type': 'multipart/form-data',
+                        'Authorization': token 
                     }
                 };
 
@@ -85,6 +88,7 @@ export default {
                 this.showSuccessMsg()
             }   
             catch(error){
+                console.log(error)
                 //  Show error message
                 this.showErrorMsg()
             }

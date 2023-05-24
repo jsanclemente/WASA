@@ -1,7 +1,5 @@
 package database
 
-import "fmt"
-
 // Function to search users that starts like the parameter "username"
 func (db *appdbimpl) SearchUser(username string, query string, id uint64) ([]User, error) {
 
@@ -9,7 +7,6 @@ func (db *appdbimpl) SearchUser(username string, query string, id uint64) ([]Use
 	rows, err := db.c.Query("SELECT * FROM Users WHERE username LIKE ? AND username != ? AND id NOT IN (SELECT banner_id FROM Bans WHERE banned_id = ?)", query+"%", username, id, id)
 
 	if err != nil {
-		fmt.Println("error")
 		return nil, err
 	}
 	defer rows.Close()

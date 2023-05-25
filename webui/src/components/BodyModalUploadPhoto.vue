@@ -18,9 +18,7 @@
 </template>
 
 <script>
-import LoadingSpinner from './LoadingSpinner.vue';
 export default {
-  components: { LoadingSpinner },
     
     data() {
         return {

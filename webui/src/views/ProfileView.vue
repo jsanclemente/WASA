@@ -86,23 +86,22 @@
 						  </div>
 						  <h3 class="text-thin text-center mt-4">Publicaciones</h3>
 						  <div class="row text-center w-75">
-							<div class="col-4" v-for="(image, id) in Object.entries(this.images).reverse()" :key="image[0]">
-								  <div class="card mt-2 mb-2 ml-2 mr-2">
-										<div class="card-image-container">
-											<img :src="image[1]" class="card-img-top h-100 border rounded">
-										</div>
+							<div class="col-lg-4 col-md-6" v-for="(image, id) in Object.entries(this.images).reverse()" :key="id">
+								<div class="card mt-2 mb-2 ml-2 mr-2">
+									<div class="card-image-container">
+										<img :src="image[1]" class="card-img-top h-100 border rounded">
+									</div>
 
-			
-										<div class="dropdown position-absolute top-0 end-0" v-if="sameUser">
-											<button class="btn btn-white border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-												<i class="material-symbols-outlined">more_horiz</i>
-											</button>
-											<ul class="dropdown-menu">
-												<button class="dropdown-item text-center text-thin" @click="deletePhoto(id)">Delete post</button>
-											</ul>
-										</div>
-								  	</div>
-							  </div>
+									<div class="dropdown position-absolute top-0 end-0" v-if="sameUser">
+										<button class="btn btn-white border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+										<i class="material-symbols-outlined">more_horiz</i>
+										</button>
+										<ul class="dropdown-menu">
+										<button class="dropdown-item text-center text-thin" @click="deletePhoto(image[0])">Delete post</button>
+										</ul>
+									</div>
+								</div>
+								</div>
 						  </div>
 						  
 					  </div>
@@ -344,6 +343,7 @@
 		  
 		  async deletePhoto(photoId) {
 				if (this.sameUser == true){
+					console.log(photoId)
 					try {
 						const token = localStorage.getItem('token')
 						console.log(photoId)
@@ -431,5 +431,8 @@
   .card-image-container {
   	height: 250px; /* Ajusta la altura deseada */
 	}
+
+
+
   
   </style>

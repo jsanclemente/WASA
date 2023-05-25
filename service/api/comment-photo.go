@@ -63,6 +63,11 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		}
 		id := commentReq.UserId
 		expectedUserId := strconv.FormatUint(commentReq.UserId, 10)
+		if expectedUserId == "" {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		// Comparar el userId del token con el valor esperado
 		if userId != expectedUserId {
 			// El userId en el token no coincide con el valor esperado

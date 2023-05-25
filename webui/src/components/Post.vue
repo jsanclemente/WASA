@@ -47,7 +47,6 @@
     props: {
       idPost: Number,
       nlikes: Number,
-      username: String,
       image: String,
       comments: Number,
       username: String,

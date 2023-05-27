@@ -1,7 +1,4 @@
-<script setup>
-import ErrorMsg from "../components/ErrorMsg.vue"
-import router from "@/router"
-</script>
+
 
 <template>
 	<div class="container-fluid">

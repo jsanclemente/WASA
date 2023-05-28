@@ -35,7 +35,7 @@ export default {
 					this.listEmpty = true
 				}
 			}
-			this.$emit('delete-comment', commentId, this.idPhoto)
+			this.$emit('delete-comment')
 		},
 		// Add a comment to the post
 		async commentPhoto(){
@@ -61,7 +61,7 @@ export default {
 				this.listEmpty = false
 				// limpia el input
 				this.$refs.commentInput.value = "";
-
+				this.$emit('comment-photo')
 				
 			}
 			catch(error){

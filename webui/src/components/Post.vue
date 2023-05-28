@@ -12,10 +12,10 @@
 									<div class="modal-content">
 										<div class="modal-header">
 											<h5 class="modal-title" id="exampleModalLabel">Comments</h5>
-											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" @click="this.$forceUpdate()" aria-label="Close"></button>
 										</div>
 										<div class="modal-body">
-											<BodyModal :idPhoto="idPost"/>
+											<BodyModal :idPhoto="idPost" @delete-comment="this.deleteComment" @comment-photo="this.commentPhoto"/>
 										</div>
 									</div>
 								</div>
@@ -77,6 +77,15 @@
         this.liked = true
         this.$emit('like',this.idPost)
       },
+
+      deleteComment(){
+        this.$emit('delete-comment')
+      },
+
+      commentPhoto(){
+        this.$emit('comment-photo')
+      },
+
       unlikePost() {
         this.liked = false
         this.$emit('unlike',this.idPost)

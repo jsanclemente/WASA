@@ -7,7 +7,7 @@
         <div class="card border-0 rounded-5 shadow-lg">
 		  <h1 class="text-center font-light mt-5 mb-3">WASAPhoto</h1>
           <div class="card-body mb-4 px-5">
-            <form @submit.prevent="login">
+            <form @submit.prevent="this.login">
 			  <error-msg v-if="error" :msg=this.errorMsg></error-msg> 
               <div class="mb-3">
                 <label for="email" class="form-label fs-4 font-light">Username</label>
@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import router from '@/router'
 export default {
 	data() {
 		return {
@@ -54,12 +55,12 @@ export default {
 				router.push('/myAccount/home')
 			} catch (error) {
 				this.error = true
-				this.errorMsg = error.response.data.message;
+				this.errorMsg = 'Something went wrong, please try again'
 			}
 		}
 	}
 }
-		</script>
+</script>
 
 <style scope>
 

@@ -19,8 +19,22 @@ func (db *appdbimpl) DeletePhoto(idUser uint64, idPhoto uint64) (uint64, error) 
 		return 0, ErrNotHisPhoto
 	}
 
-	// Esta sentencia borra en la tabla Posts, Likes, Comments gracias al ON DELETE CASCADE
-	_, err := db.c.Exec(`DELETE FROM Photos WHERE id=?`, idPhoto)
+	_, err := db.c.Exec(`DELETE FROM Posts WHERE photo_id=?`, idPhoto)
+	if err != nil {
+		return 0, err
+	}
+
+	_, err = db.c.Exec(`DELETE FROM Comments WHERE photo_id=?`, idPhoto)
+	if err != nil {
+		return 0, err
+	}
+
+	_, err = db.c.Exec(`DELETE FROM Likes WHERE photo_id=?`, idPhoto)
+	if err != nil {
+		return 0, err
+	}
+
+	_, err = db.c.Exec(`DELETE FROM Photos WHERE id=?`, idPhoto)
 	if err != nil {
 		return 0, err
 	}

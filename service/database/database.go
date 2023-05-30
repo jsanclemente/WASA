@@ -163,14 +163,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
 
-	_, err := db.Exec("PRAGMA foreign_keys = ON;")
-	if err != nil {
-		return nil, fmt.Errorf("enabling foreign key support: %w", err)
-	}
-
 	// Check if table USERS exists. If not, the database is empty, and we need to create the structure
 	var tableName string
-	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='Users';`).Scan(&tableName)
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='Users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE Users (id INTEGER PRIMARY KEY,
 			 username TEXT, nfollowers INTEGER NOT NULL, nfollowing INTEGER NOT NULL,
@@ -201,7 +196,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 			 			photo_id INTEGER  NOT NULL,
 						comment TEXT NOT NULL,
 						FOREIGN KEY (user_id) REFERENCES Users(id),
-						FOREIGN KEY (photo_id) REFERENCES Photos(id) ON DELETE CASCADE
+						FOREIGN KEY (photo_id) REFERENCES Photos(id)
 					);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
@@ -213,7 +208,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	err = db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='Posts';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE Posts (photo_id INTEGER NOT NULL, user_id INTEGER NOT NULL,
-			date DATETIME, PRIMARY KEY(user_id,photo_id), FOREIGN KEY (photo_id) REFERENCES Photos(id) ON DELETE CASCADE, 
+			date DATETIME, PRIMARY KEY(user_id,photo_id), FOREIGN KEY (photo_id) REFERENCES Photos(id), 
 			FOREIGN KEY (user_id) REFERENCES Users(id));`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
@@ -226,7 +221,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		sqlStmt := `CREATE TABLE Likes (user_id INTEGER NOT NULL, photo_id INTEGER NOT NULL,
 			PRIMARY KEY(user_id,photo_id), FOREIGN KEY (user_id) REFERENCES Users(id),
-			FOREIGN KEY (photo_id) REFERENCES Photos(id) ON DELETE CASCADE);`
+			FOREIGN KEY (photo_id) REFERENCES Photos(id));`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure <Likes>: %w", err)

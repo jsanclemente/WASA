@@ -84,22 +84,47 @@
 								  <button v-if="banned" @click="handleBan" class="btn btn-white btn-lg border-1 border-dark w-100">Unban</button>
 							  </div>
 						  </div>
-						  <h3 class="text-thin text-center mt-4">Publicaciones</h3>
+						  <h3 class="text-thin text-center mt-4">Posts</h3>
 						  <div class="row text-center w-75">
 							<div class="col-lg-4 col-md-6" v-for="(image, id) in Object.entries(this.images).reverse()" :key="id">
 								<div class="card mt-2 mb-2 ml-2 mr-2">
 									<div class="card-image-container">
-										<img :src="image[1]" class="card-img-top h-100 border rounded">
+										<img :src="image[1].Image" class="card-img-top h-100 border rounded">
 									</div>
 
 									<div class="dropdown position-absolute top-0 end-0" v-if="sameUser">
-										<button class="btn btn-white border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-										<i class="material-symbols-outlined">more_horiz</i>
-										</button>
-										<ul class="dropdown-menu">
-										<button class="dropdown-item text-center text-thin" @click="deletePhoto(image[0])">Delete post</button>
-										</ul>
+								<button class="btn btn-white border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+									<i class="material-symbols-outlined">more_horiz</i>
+								</button>
+								<ul class="dropdown-menu" @comment-photo="commentPhoto" @delete-comment="deleteComment">
+									<div class="text-center text-thin">
+  										<span class="text-thin">Likes: </span>
+  										<span class="px-2 likes">{{image[1].nLikes }} </span>
 									</div>
+									<button class="dropdown-item text-center text-thin" data-bs-toggle="modal" :data-bs-target="'#exampleModalComments-' + image[0]">
+										<i class="material-symbols-outlined">comment</i>
+										<span class="comments px-2">{{image[1].nComments }}   </span>
+									</button>
+									<button class="dropdown-item text-center text-thin" @click="deletePhoto(image[0])">Delete post</button>
+								</ul>
+								</div>
+								
+
+								<!-- Modal para Comments-->
+								<div class="modal fade" :id="'exampleModalComments-' + image[0]" tabindex="-1" aria-labelledby="exampleModalLabelComments" aria-hidden="true">
+								<div class="modal-dialog modal-dialog-centered">
+									<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="exampleModalLabelComments">Comments</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<BodyModal :idPhoto="parseInt(this.posts[this.nPosts-1-id])" @comment-photo="commentPhoto" @delete-comment="deleteComment"/>
+									</div>
+									</div>
+								</div>
+								</div>
+
 								</div>
 								</div>
 						  </div>
@@ -113,6 +138,8 @@
   
   <script>
   import ErrorMsg from '../components/ErrorMsg.vue';
+  import BodyModal from '../components/BodyModal.vue';
+
   export default {
 	components: { ErrorMsg },
   
@@ -124,6 +151,7 @@
 			  nPosts: 0,
 			  nFollowers: 0,
 			  nFollowing: 0,
+			  nLikes: 0,
 			  posts: [],
 			  followers: [],
 			  followersList: [],
@@ -137,8 +165,10 @@
 			  messageError: "",
 			  usernameChanged: false,
 			  newUsername: "",
-			  images: {}
-		  }
+			  images: {},
+			  likesCount: {}, // Objeto para almacenar el número de likes por publicación
+    		  comments: [] // Objeto para almacenar el número de comentarios por publicación
+  }
 	  },
   
 	  methods: {
@@ -343,15 +373,15 @@
 		  
 		  async deletePhoto(photoId) {
 				if (this.sameUser == true){
-					console.log(photoId)
 					try {
 						const token = localStorage.getItem('token')
-						console.log(photoId)
 						let response = await this.$axios.delete("/photos/" + photoId + "?userId=" + this.id, {
 							headers: {
 								Authorization: token
 							}
 						})
+
+						console.log(response)
 						delete this.images[photoId]
 
 						const index = this.posts.indexOf(parseInt(photoId));
@@ -365,7 +395,41 @@
 						console.log(error)
 					}
 				}
-          }
+          },
+
+		  async commentPhoto(){
+				this.deleteComment()
+			},
+
+			async deleteComment(){
+				//just recharge the images information
+				try {
+					const token = localStorage.getItem('token')
+					let response = await this.$axios.get("/users/"+ this.id + "/profile", {
+						headers: {
+							Authorization: token
+						}
+					})
+					this.posts = response.data.Posts
+
+					if (this.posts !== null){
+						for (let i = 0; i < this.posts.length; i++) {
+						let image = await this.$axios.get("/photos/"+ this.posts[i] + "/image", {
+							headers: {
+								Authorization: token
+							}
+						})
+						this.images[image.data.ID] = {Image: "data:image/jpeg;base64,"+image.data.Image,
+														nLikes: image.data.Nlikes,
+														nComments: image.data.Ncomments
+													}
+						}
+					}
+				}
+				catch(error){
+					console.log(error)
+				}
+			},
 	  },
   
 	  async created(){
@@ -385,8 +449,6 @@
 			  this.posts = response.data.Posts
 			  console.log(this.posts)
 
-
-
 			  if (this.posts !== null){
 				for (let i = 0; i < this.posts.length; i++) {
 				  let image = await this.$axios.get("/photos/"+ this.posts[i] + "/image", {
@@ -394,7 +456,10 @@
 						Authorization: token
 					}
 				  })
-				  this.images[image.data.ID] = "data:image/jpeg;base64,"+image.data.Image
+				  this.images[image.data.ID] = {Image: "data:image/jpeg;base64,"+image.data.Image,
+				  								nLikes: image.data.Nlikes,
+												nComments: image.data.Ncomments
+											}
 			  	}
 			  }
   
